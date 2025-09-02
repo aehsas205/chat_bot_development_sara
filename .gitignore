@@ -1,0 +1,14 @@
+# Ignore environment variables
+.env
+
+# Ignore virtual environment
+venv/
+
+samp.html
+
+marked.min.js
+
+
+
+
+

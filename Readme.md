@@ -98,7 +98,7 @@ Then open `http://localhost:3000/samp.html` in your browser
 - **Session ID**: Unique identifier for each user session
 
 ### 3. Chatbot Engine (`chatbot.py`)
-- **LLM Setup**: Google Gemini 2.0 Flash model
+- **LLM Setup**: Google Gemini 3.1 Flash Lite model
 - **Tools Integration**: Binds retrieval and feedback tools
 - **State Management**: Handles conversation state
 
@@ -210,7 +210,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 - The system uses LangGraph for workflow management
 - ChromaDB provides persistent vector storage
-- Google Gemini 2.0 Flash powers the language model
+- Google Gemini 3.1 Flash Lite model powers the language model
 - FastAPI provides the REST API framework
 - Session-based memory maintains conversation context
 - Automatic RAG pipeline warm-up on server startup

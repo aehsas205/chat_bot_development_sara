@@ -11,7 +11,7 @@ import logging
 
 load_dotenv()
 
-model="gemini-2.0-flash"
+model="gemini-3.1-flash-lite"
 model_provider="google_genai"
 log = logging.getLogger("aehsas")
 
@@ -20,8 +20,8 @@ class State(TypedDict):
 
 # List of tools the chatbot can call
 tools = [retrieve_similar_documents,handle_feedback]
-#Gemini 2.5 Flash-Lite
-#gemini-2.0-flash
+
+
 
 llm = init_chat_model(
     model=model,

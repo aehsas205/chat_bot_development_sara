@@ -11,7 +11,7 @@ from graph import graph
 import asyncio
 import time
 import logging
-
+from typing import Optional
 
 # ----------------------------
 # Logging
@@ -25,10 +25,11 @@ logger = logging.getLogger("aehsas")
 
 
 # ----------------------------
-# Request Model
+# Request Model (Updated to accept custom session_id)
 # ----------------------------
 class ChatRequest(BaseModel):
     user_input: str
+    session_id: Optional[str] = None  # Allows the frontend to specify a chat thread
 
 
 # ----------------------------
@@ -99,12 +100,9 @@ async def warmup_task():
 # ----------------------------
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
     # asyncio.create_task(warmup_task())
     asyncio.create_task(cleanup_expired_sessions())
-
     yield
-
     logger.info("Shutting down...")
 
 
@@ -119,7 +117,7 @@ app.add_middleware(
         "http://localhost:3000",
         "https://aehsasfoundation.com"
     ],
-    allow_credentials=False,
+    allow_credentials=True, # Changed to True to allow session management headers/cookies if needed
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -139,15 +137,13 @@ async def health():
 # ----------------------------
 @app.get("/", response_class=HTMLResponse)
 async def get_index():
-
     with open("samp.html", "r", encoding="utf-8") as f:
         html = f.read()
-
     return HTMLResponse(content=html)
 
 
 # ----------------------------
-# Chat Endpoint
+# Chat Endpoint (Updated)
 # ----------------------------
 @app.post("/chat")
 async def chat_endpoint(
@@ -155,10 +151,15 @@ async def chat_endpoint(
     request: Request,
     response: Response
 ):
-
-    session_id = get_or_create_session_id(request, response)
+    # 1. Use frontend session_id if provided; fallback to cookie session if not
+    if data.session_id:
+        session_id = data.session_id
+    else:
+        session_id = get_or_create_session_id(request, response)
+        
     last_access[session_id] = time.time()
 
+    # 2. Configure LangGraph thread boundary using the session ID
     config = {
         "configurable": {
             "thread_id": session_id
@@ -170,7 +171,6 @@ async def chat_endpoint(
     )
 
     state = graph.get_state(config)
-
     messages = []
 
     if (
@@ -182,7 +182,7 @@ async def chat_endpoint(
 
     messages.append(user_message)
 
-    # Run LangGraph
+    # Run LangGraph isolated to this thread
     response_obj = await asyncio.to_thread(
         graph.invoke,
         {"messages": messages},
@@ -195,40 +195,24 @@ async def chat_endpoint(
 
     last_message = response_obj["messages"][-1]
 
-    print("\nLast message object:")
-    print(last_message)
-
-    print("\nContent:")
-    print(last_message.content)
-
-    print("\nContent type:")
-    print(type(last_message.content))
-
-    # Handle string response
+    # Handle response extraction formats
     if isinstance(last_message.content, str):
         reply = last_message.content
-
-    # Handle list response
     elif isinstance(last_message.content, list):
-
         reply = ""
-
         for item in last_message.content:
-
             if isinstance(item, dict):
-
                 if item.get("type") == "text":
                     reply += item.get("text", "")
-
             else:
                 reply += str(item)
-
     else:
         reply = str(last_message.content)
 
     print("\nFinal Reply:")
     print(reply)
 
+    # Return response along with current session ID so frontend knows which track it's on
     return {
         "response": reply,
         "session_id": session_id

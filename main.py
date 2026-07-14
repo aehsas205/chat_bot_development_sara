@@ -213,7 +213,3 @@ async def chat_endpoint(
     print(reply)
 
     # Return response along with current session ID so frontend knows which track it's on
-    return {
-        "response": reply,
-        "session_id": session_id
-    }

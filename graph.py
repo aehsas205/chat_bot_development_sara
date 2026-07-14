@@ -15,4 +15,3 @@ graph_builder.add_edge(START, "chatbot")
 graph_builder.add_conditional_edges("chatbot", tools_condition)
 graph_builder.add_edge("tools", "chatbot")
 
-graph = graph_builder.compile(checkpointer=memory)

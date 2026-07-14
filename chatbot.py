@@ -31,3 +31,9 @@ llm = init_chat_model(
 
 
 
+def chatmodel(state: State):
+    t0=time.time()
+    output = llm.invoke(state["messages"])
+    t1=time.time()
+    log.info("[LLM] %.3fs model=%s", (t1 - t0), model)
+    return {"messages": state["messages"] + [output]}

@@ -9,48 +9,61 @@ from google import genai
 from langchain_core.messages import AIMessage
 
 from retriever import retrieve_similar_documents
-from feedback import handle_feedback
+from feedback import handle_feedback  # 👈 Import handle_feedback
 
 load_dotenv()
-
-log = logging.getLogger("aehsas")
 
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
-# Dummy/Placeholder list taaki graph.py ka import crash na ho
-tools = []
+# 👈 Bind the tool here so graph.py gets it correctly
+tools = [handle_feedback]
 
-# Google GenAI Client
-client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
+api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+client = genai.Client(api_key=api_key)
 
 def chatmodel(state: State):
-    t0 = time.time()
-    
-    # User ka last message extract karein
     last_message = state["messages"][-1]
-    user_query = getattr(last_message, "content", str(last_message))
     
-    # 1. ChromaDB database se information retrieve karein
+    if hasattr(last_message, "content"):
+        user_query = str(last_message.content)
+    elif isinstance(last_message, dict):
+        user_query = str(last_message.get("content", ""))
+    else:
+        user_query = str(last_message)
+    
+    print("\n" + "="*50)
+    print(f"[DEBUG USER QUERY RECEIVED]: '{user_query}'")
+    
+    # Retrieve Context
     context = retrieve_similar_documents(user_query)
+    print(f"[DEBUG CONTEXT LENGTH RETRIEVED]: {len(context)} characters")
+    print("="*50 + "\n")
     
-    # 2. Complete Context Prompt compose karein
-    prompt = f"""You are an AI Assistant for AEHSAS Foundation.
-Use the following retrieved context from the database to answer the user question accurately.
+    # Fallback if context is too short
+    if not context or len(context) < 20:
+        context = retrieve_similar_documents("membership types fees General Member Lifetime Member Patron Special")
 
-Context:
+    prompt = f"""You are the official AI Assistant for AEHSAS Foundation.
+
+Answer the user question accurately using ONLY the provided database context below.
+If asked about membership, list all membership types, fees, and roles clearly.
+
+--- CONTEXT FROM DATABASE ---
 {context}
+-----------------------------
 
-Question: {user_query}
-"""
+User Question: {user_query}
+Answer:"""
 
-    # 3. Direct Google GenAI API Call (No Langchain 404/v1beta bugs)
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt
-    )
-    
-    t1 = time.time()
-    log.info("[LLM] %.3fs model=gemini-2.5-flash", (t1 - t0))
-    
-    return {"messages": state["messages"] + [AIMessage(content=response.text)]}
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt
+        )
+        answer_text = response.text
+    except Exception as e:
+        print(f"❌ GEMINI ERROR: {e}")
+        answer_text = "I am having trouble processing your request right now. Please try again."
+
+    return {"messages": [AIMessage(content=answer_text)]}

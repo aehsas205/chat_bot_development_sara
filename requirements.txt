@@ -3,7 +3,7 @@ uvicorn==0.34.3
 pydantic==2.10.6
 python-dotenv==1.0.1
 
-torch--index-url https://download.pytorch.org/whl/cpu
+--extra-index-url https://download.pytorch.org/whl/cpu
 torch
 
 langchain==0.3.27

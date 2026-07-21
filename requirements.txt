@@ -3,18 +3,18 @@ uvicorn==0.34.3
 pydantic==2.10.6
 python-dotenv==1.0.1
 
---extra-index-url https://download.pytorch.org/whl/cpu
-torch==2.6.0+cpu
+torch--index-url https://download.pytorch.org/whl/cpu
+torch
 
 langchain==0.3.27
 langchain-core==0.3.75
-chromadb==0.4.24
-langchain-chroma==0.1.2
+chromadb>=0.5.0
+langchain-chroma
 langchain-huggingface==0.3.1
 langchain-google-genai==2.0.10
 google-genai
 pymupdf==1.26.4
-langchain_community
+langchain-community
 
 beautifulsoup4
 requests
@@ -26,5 +26,4 @@ langgraph-prebuilt==0.2.2
 
 sentence-transformers==3.4.1
 transformers==4.49.0
-numpy==2.2.3
 google-generativeai==0.8.4

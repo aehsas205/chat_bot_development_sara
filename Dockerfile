@@ -1,18 +1,17 @@
-FROM python:3.10-slim
+FROM python:3.10
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
+# Install dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy all project files
 COPY . .
 
-# Cloud Run automatically passes PORT environment variable (default 8080)
-EXPOSE 8080
+# Run data scraping & embedding to generate fresh ChromaDB vector store
+RUN python scrape_and_embed.py
 
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8080}"]
+# Expose port and start app
+EXPOSE 10000
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000"]

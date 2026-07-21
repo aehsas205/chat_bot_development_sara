@@ -5,7 +5,7 @@ from typing import TypedDict, Annotated
 from dotenv import load_dotenv
 
 from langgraph.graph.message import add_messages
-from google import genai
+import google.generativeai as genai
 from langchain_core.messages import AIMessage
 
 from retriever import retrieve_similar_documents

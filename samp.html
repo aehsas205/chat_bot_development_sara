@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AEHSAS Foundation - Official Chatbot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: rgba(30, 41, 59, 0.7);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #10b981;
+      --user-msg-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      --bot-msg-bg: rgba(30, 41, 59, 0.85);
+      --bot-msg-border: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(15, 23, 42, 0.6);
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Background Elements */
+    .bg-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      z-index: 0;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 400px;
+      height: 400px;
+      background: #4f46e5;
+      top: -100px;
+      left: -100px;
+    }
+    .blob-2 {
+      width: 350px;
+      height: 350px;
+      background: #059669;
+      bottom: -100px;
+      right: -100px;
+    }
+
+    /* App Container */
+    .app-container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 950px;
+      height: 90vh;
+      max-height: 850px;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Header */
+    header {
+      padding: 20px 28px;
+      background: rgba(15, 23, 42, 0.5);
+      border-bottom: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-info {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #ffffff;
+      box-shadow: 0 0 20px var(--primary-glow);
+    }
+
+    .brand-text h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      display: inline-block;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-contact, .btn-clear {
+      padding: 8px 14px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--text-main);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .btn-contact:hover, .btn-clear:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-clear:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+
+    /* Chat Area */
+    .chat-area {
+      flex: 1;
+      padding: 24px 28px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-area::-webkit-scrollbar {
+      width: 6px;
+    }
+    .chat-area::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+    }
+
+    /* Welcome Banner */
+    .welcome-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      border-radius: 18px;
+      padding: 22px;
+      text-align: center;
+      margin-bottom: 10px;
+      animation: fadeIn 0.4s ease-out;
+    }
+
+    .welcome-card h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 6px;
+      color: #ffffff;
+    }
+
+    .welcome-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 650px;
+      margin: 0 auto 16px auto;
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .chip {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #e2e8f0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--primary-glow);
+    }
+
+    /* Message Rows */
+    .message-row {
+      display: flex;
+      gap: 12px;
+      max-width: 82%;
+      animation: messageSlide 0.3s ease-out forwards;
+    }
+
+    .message-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .message-row.bot {
+      align-self: flex-start;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .user .avatar {
+      background: linear-gradient(135deg, #a855f7, #6366f1);
+      color: #ffffff;
+    }
+
+    .bot .avatar {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 18px;
+      font-size: 0.93rem;
+      line-height: 1.55;
+      word-wrap: break-word;
+      position: relative;
+    }
+
+    .user .bubble {
+      background: var(--user-msg-bg);
+      color: #ffffff;
+      border-top-right-radius: 4px;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+    }
+
+    .bot .bubble {
+      background: var(--bot-msg-bg);
+      border: 1px solid var(--bot-msg-border);
+      color: #f1f5f9;
+      border-top-left-radius: 4px;
+    }
+
+    /* Error Message Bubble Styling */
+    .bot .bubble.error-bubble {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+    }
+
+    .bubble p {
+      margin-bottom: 8px;
+    }
+    .bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    .bubble a {
+      color: #60a5fa;
+      text-decoration: underline;
+    }
+
+    .msg-time {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      align-self: flex-end;
+    }
+    .user .msg-time {
+      align-self: flex-start;
+    }
+
+    /* Typing Indicator */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 12px 18px;
+    }
+    .dot {
+      width: 7px;
+      height: 7px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: pulse 1.4s infinite ease-in-out both;
+    }
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+
+    /* Input Footer */
+    footer {
+      padding: 18px 28px 22px 28px;
+      background: rgba(15, 23, 42, 0.7);
+      border-top: 1px solid var(--card-border);
+    }
+
+    .input-box {
+      display: flex;
+      align-items: center;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 6px 8px 6px 18px;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .input-box:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    textarea {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 0.95rem;
+      resize: none;
+      max-height: 120px;
+      height: 24px;
+      line-height: 24px;
+    }
+
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .btn-send {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--primary);
+      border: none;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-send:hover {
+      background: var(--primary-hover);
+      transform: scale(1.05);
+      box-shadow: 0 0 12px var(--primary-glow);
+    }
+
+    .btn-send:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .footer-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      margin-top: 10px;
+      padding: 0 4px;
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes messageSlide {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+
+    @media (max-width: 640px) {
+      body { padding: 0; }
+      .app-container { height: 100vh; max-height: none; border-radius: 0; border: none; }
+      .message-row { max-width: 90%; }
+      header { padding: 14px 18px; }
+      .chat-area { padding: 16px 18px; }
+      footer { padding: 14px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header>
+      <div class="brand-info">
+        <div class="brand-icon">
+          <i class="fa-solid fa-hand-holding-heart"></i>
+        </div>
+        <div class="brand-text">
+          <h1>AEHSAS Foundation</h1>
+          <p><span class="status-dot"></span> AI Assistant &bull; Online</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-clear" onclick="clearCacheHistory()" title="Clear Chat History">
+          <i class="fa-solid fa-trash-can"></i> Clear Chat
+        </button>
+        <a href="https://aehsasfoundation.com/contact-us" target="_blank" class="btn-contact">
+          <i class="fa-solid fa-headset"></i> Contact Us
+        </a>
+      </div>
+    </header>
+
+    <!-- Chat Stream Area -->
+    <div class="chat-area" id="chatArea">
+      <div class="welcome-card" id="welcomeCard">
+        <h2>Welcome to AEHSAS Foundation 👋</h2>
+        <p>I am your verified AI assistant. Ask me about our humanitarian programs, volunteer opportunities, donations, or services in English or Hindi.</p>
+        
+        <div class="suggestions">
+          <button class="chip" onclick="sendSuggested('What are the main programs of AEHSAS Foundation?')">
+            <i class="fa-solid fa-circle-question"></i> Main Programs
+          </button>
+          <button class="chip" onclick="sendSuggested('How can I volunteer or donate?')">
+            <i class="fa-solid fa-heart"></i> Volunteer & Donate
+          </button>
+          <button class="chip" onclick="sendSuggested('एहसास फ़ाउंडेशन क्या कार्य करता है?')">
+            <i class="fa-solid fa-language"></i> हिंदी में जानकारी
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer Input Bar -->
+    <footer>
+      <div class="input-box">
+        <textarea id="userInput" placeholder="Type your question here... (Press Enter to send)" rows="1" oninput="autoResize(this)" onkeydown="handleKeyDown(event)"></textarea>
+        <button id="sendBtn" class="btn-send" onclick="sendMessage()">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+      <div class="footer-meta">
+        <span>Powered by AEHSAS RAG Engine</span>
+        <span id="sessionDisplay">Session: Active</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const API_URL = '/chat';
+    let sessionId = localStorage.getItem('aehsas_session_id') || '';
+
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const sessionDisplay = document.getElementById('sessionDisplay');
+
+    // Load Cached History on Page Load
+    document.addEventListener('DOMContentLoaded', () => {
+      loadChatHistoryFromCache();
+    });
+
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function formatTime(timestamp) {
+      const date = timestamp ? new Date(timestamp) : new Date();
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function sendSuggested(text) {
+      userInput.value = text;
+      sendMessage();
+    }
+
+    // --- CACHE MANAGEMENT FUNCTIONS ---
+    function saveMessageToCache(sender, text, timestamp, isError = false) {
+      let history = JSON.parse(localStorage.getItem('aehsas_chat_history') || '[]');
+      history.push({ sender, text, timestamp: timestamp || new Date().toISOString(), isError });
+      localStorage.setItem('aehsas_chat_history', JSON.stringify(history));
+    }
+
+    function loadChatHistoryFromCache() {
+      let history = JSON.parse(localStorage.getItem('aehsas_chat_history') || '[]');
+      if (history.length > 0) {
+        history.forEach(msg => {
+          if (msg.sender === 'user') {
+            appendUserMessageUI(msg.text, msg.timestamp);
+          } else {
+            appendBotMessageUI(msg.text, msg.timestamp, msg.isError);
+          }
+        });
+      }
+      if (sessionId) {
+        sessionDisplay.textContent = `Session: ${sessionId.slice(0, 8)}...`;
+      }
+    }
+
+    function clearCacheHistory() {
+  if (confirm('Are you sure you want to clear your chat history?')) {
+    localStorage.removeItem('aehsas_chat_history');
+    localStorage.removeItem('aehsas_session_id');
+    localStorage.setItem('aehsas_session_id', 'session_' + Date.now());
+    location.reload();
+  }
+}
+
+    // --- UI APPEND FUNCTIONS ---
+    function appendUserMessageUI(text, timestamp) {
+      const row = document.createElement('div');
+      row.className = 'message-row user';
+      row.innerHTML = `
+        <div class="avatar"><i class="fa-solid fa-user"></i></div>
+        <div>
+          <div class="bubble">${escapeHtml(text)}</div>
+          <div class="msg-time">${formatTime(timestamp)}</div>
+        </div>
+      `;
+      chatArea.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendBotMessageUI(text, timestamp, isError = false) {
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+      row.innerHTML = `
+        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+        <div>
+          <div class="bubble ${isError ? 'error-bubble' : ''}">${formatBotResponse(text)}</div>
+          <div class="msg-time">${formatTime(timestamp)}</div>
+        </div>
+      `;
+      chatArea.appendChild(row);
+      scrollToBottom();
+    }
+
+    function appendUserMessage(text) {
+      const now = new Date().toISOString();
+      appendUserMessageUI(text, now);
+      saveMessageToCache('user', text, now);
+    }
+
+    function appendBotMessage(text, isError = false) {
+      const now = new Date().toISOString();
+      appendBotMessageUI(text, now, isError);
+      saveMessageToCache('bot', text, now, isError);
+    }
+
+    function showTypingIndicator() {
+      const row = document.createElement('div');
+      row.className = 'message-row bot';
+      row.id = 'typingIndicator';
+      row.innerHTML = `
+        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+        <div class="bubble typing-indicator">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      `;
+      chatArea.appendChild(row);
+      scrollToBottom();
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('typingIndicator');
+      if (indicator) indicator.remove();
+    }
+
+    async function sendMessage() {
+      const text = userInput.value.trim();
+      if (!text) return;
+
+      appendUserMessage(text);
+      userInput.value = '';
+      userInput.style.height = '24px';
+      sendBtn.disabled = true;
+
+      showTypingIndicator();
+
+      try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (sessionId) {
+          headers['X-Session-ID'] = sessionId;
+        }
+
+        const response = await fetch(API_URL, {
+  method: 'POST',
+  headers: headers,
+  body: JSON.stringify({ 
+    user_input: text,
+    session_id: sessionId 
+  })
+});
+
+        removeTypingIndicator();
+
+        // Error status handle (e.g. 500, 404, 400)
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          const detail = errorData.detail || `Server returned status error (${response.status}).`;
+          throw new Error(detail);
+        }
+
+        const data = await response.json();
+        
+        if (data.session_id) {
+          sessionId = data.session_id;
+          localStorage.setItem('aehsas_session_id', sessionId);
+          sessionDisplay.textContent = `Session: ${sessionId.slice(0, 8)}...`;
+        }
+
+        appendBotMessage(data.response || 'No response received.');
+      } catch (err) {
+        removeTypingIndicator();
+        console.error("Fetch error details:", err);
+        const errorMessage = `⚠️ **Error:** ${err.message || "Unable to connect to backend server. Please verify if FastAPI server is running."}`;
+        appendBotMessage(errorMessage, true);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function formatBotResponse(text) {
+      let formatted = escapeHtml(text);
+      formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      formatted = formatted.replace(/\[([^\]]+)\]\((https?:\/\/[^\)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+      formatted = formatted.replace(/(https?:\/\/[^\s<]+)/g, function(url) {
+        if (url.includes('">')) return url;
+        return `<a href="${url}" target="_blank">${url}</a>`;
+      });
+      formatted = formatted.replace(/\n/g, '<br>');
+      return formatted;
+    }
+
+    function scrollToBottom() {
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+  </script>
+</body>
+</html>

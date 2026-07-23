@@ -76,3 +76,60 @@ if all_chunks:
     print("✅ Success! Both Website and PDF content are now stored with full context in ChromaDB.")
 else:
     print("❌ No content found to embed.")
+
+
+
+
+
+def process_and_embed_pdf(pdf_file_path: str):
+    """
+    Processes a single uploaded PDF file and appends its embeddings to ChromaDB.
+    """
+    if not os.path.exists(pdf_file_path):
+        raise FileNotFoundError(f"PDF file not found at path: {pdf_file_path}")
+
+    print(f"📄 Processing newly uploaded PDF: {pdf_file_path}...")
+    
+    # Load PDF
+    pdf_loader = PyMuPDFLoader(pdf_file_path)
+    pdf_docs = pdf_loader.load()
+
+    if not pdf_docs:
+        raise ValueError("The uploaded PDF is empty or could not be read.")
+
+    # Split into chunks (same optimal chunk size)
+    pdf_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=1500,
+        chunk_overlap=300,
+        separators=["\n\n", "\n", " ", ""]
+    )
+    pdf_chunks = pdf_splitter.split_documents(pdf_docs)
+
+    # Embed & Add to ChromaDB
+    vs = get_vectorstore()
+    vs.add_documents(pdf_chunks)
+    
+    print(f"✅ Successfully embedded {len(pdf_chunks)} chunks from '{os.path.basename(pdf_file_path)}' into ChromaDB!")
+    return len(pdf_chunks)
+
+
+
+
+
+#----------------------------------------------#
+# update any changes in website
+#----------------------------------------------#
+def reindex_website_only():
+    """Fetches latest website content and updates ChromaDB embeddings."""
+    print("🌐 Re-indexing website content...")
+    clean_text = fetch_website_content(URL)
+    if clean_text:
+        doc = Document(page_content=clean_text, metadata={"source": URL})
+        web_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+        web_chunks = web_splitter.split_documents([doc])
+        
+        vs = get_vectorstore()
+        vs.add_documents(web_chunks)
+        print(f"✅ Re-indexed {len(web_chunks)} website chunks into ChromaDB!")
+        return len(web_chunks)
+    return 0

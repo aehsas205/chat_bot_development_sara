@@ -27,3 +27,4 @@ langgraph-prebuilt==0.2.2
 sentence-transformers==3.4.1
 transformers==4.49.0
 google-generativeai==0.8.4
+python-multipart

@@ -80,32 +80,22 @@ def send_email_notification(user_query: str, session_id: str):
         print(f"❌ Failed to send email: {e}")
 
 
-def send_error_notification(error_type: str, error_msg: str, traceback_details: str):
-    """Sends an emergency email alert to the admin when a critical backend error occurs."""
+def send_error_notification(error_type: str = None, error_msg: str = None, traceback_details: str = None):
+    """Sends a clean emergency email alert to the admin when an internal error occurs (without raw tracebacks)."""
     if not SENDER_EMAIL or not SENDER_PASSWORD:
         print("⚠️ Skipping error email alert due to missing credentials.")
         return
 
-    subject = f"🚨 CRITICAL SYSTEM ERROR: {error_type}"
-    body = f"""
-    ⚠️ ATTENTION ADMIN,
-
-    A critical system error occurred in the AEHSAS Chatbot server:
-
-    📌 Error Type: {error_type}
-    📝 Error Message: {error_msg}
-    ⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-
-    📋 Traceback Details:
-    --------------------------------------------------
-    {traceback_details}
-    --------------------------------------------------
-
-    Please check the server logs immediately.
-
-    Best regards,
-    AEHSAS Monitoring System
-    """
+    subject = "🚨 CRITICAL SYSTEM ERROR: AEHSAS Chatbot Server"
+    
+    body = (
+        "⚠️ ATTENTION ADMIN,\n\n"
+        "Chatbot failed because of internal error. "
+        "Please take the appropriate action to resolve the issue.\n\n"
+        f"⏰ Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        "Best regards,\n"
+        "AEHSAS Monitoring System"
+    )
 
     msg = MIMEMultipart()
     msg['From'] = SENDER_EMAIL
@@ -117,7 +107,7 @@ def send_error_notification(error_type: str, error_msg: str, traceback_details: 
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.send_message(msg)
-        print(f"🚨 Emergency Error Alert sent to {ADMIN_EMAIL}")
+        print(f"🚨 Clean Emergency Error Alert sent to {ADMIN_EMAIL}")
     except Exception as e:
         print(f"❌ Failed to send error email notification: {e}")
 

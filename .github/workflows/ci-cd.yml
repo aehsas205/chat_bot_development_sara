@@ -1,4 +1,4 @@
-name: CI Pipeline Test
+name: CI/CD Pipeline
 
 on:
   push:
@@ -27,3 +27,10 @@ jobs:
     - name: Build Docker Image Test
       run: |
         docker build -t aehsas-chatbot:latest .
+
+    # --- 🚀 CD Step (Continuous Deployment) ---
+    - name: Trigger Render Deployment (CD)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        echo "CI Passed! Triggering Deployment..."
+        curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

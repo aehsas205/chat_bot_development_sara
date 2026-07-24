@@ -72,7 +72,9 @@ def send_email_notification(user_query: str, session_id: str):
     msg.attach(MIMEText(body, 'plain'))
 
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        # 🔑 FIX: Port 587 with STARTTLS and timeout=10 prevents connection drops
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as server:
+            server.starttls()
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.send_message(msg)
         print(f"📧 Notification sent to {ADMIN_EMAIL}")
@@ -104,7 +106,9 @@ def send_error_notification(error_type: str = None, error_msg: str = None, trace
     msg.attach(MIMEText(body, 'plain'))
 
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        # 🔑 FIX: Port 587 with STARTTLS and timeout=10
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as server:
+            server.starttls()
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.send_message(msg)
         print(f"🚨 Clean Emergency Error Alert sent to {ADMIN_EMAIL}")
@@ -125,7 +129,9 @@ def send_email_alert(subject: str, body: str):
     msg.attach(MIMEText(body, 'plain'))
 
     try:
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+        # 🔑 FIX: Port 587 with STARTTLS and timeout=10
+        with smtplib.SMTP('smtp.gmail.com', 587, timeout=10) as server:
+            server.starttls()
             server.login(SENDER_EMAIL, SENDER_PASSWORD)
             server.send_message(msg)
         print(f"📧 Alert sent to {ADMIN_EMAIL}")

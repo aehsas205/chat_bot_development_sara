@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+import traceback
 from typing import TypedDict, Annotated
 from dotenv import load_dotenv
 
@@ -19,10 +20,14 @@ ADMIN_EMAIL = os.getenv("ADMIN_EMAIL")
 class State(TypedDict):
     messages: Annotated[list, add_messages]
 
-# 👈 Bind the tool here so graph.py gets it correctly
 tools = [handle_feedback]
 
+# Load API Key safely
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+
+if not api_key:
+    print("❌ CRITICAL WARNING: No GEMINI_API_KEY found in .env file!")
+
 client = genai.Client(api_key=api_key)
 
 def chatmodel(state: State):
@@ -48,7 +53,7 @@ def chatmodel(state: State):
         context = retrieve_similar_documents("membership types fees General Member Lifetime Member Patron Special")
 
     prompt = f"""You are the official AI Assistant for AEHSAS Foundation.
-    Answer the user question accurately using ONLY the provided database context below.
+Answer the user question accurately using ONLY the provided database context below.
 If asked about membership, list all membership types, fees, and roles clearly.
 
 CRITICAL LANGUAGE RULE:
@@ -56,9 +61,6 @@ Always respond in the EXACT same language and script used by the user in their q
 - If the user asks in Urdu script (e.g., اردو), respond strictly in Urdu script.
 - If the user asks in Hindi script (e.g., हिंदी), respond in Hindi script.
 - If the user asks in English or Roman script, respond in English or Roman script.
-
-Answer the user question accurately using ONLY the provided database context below.
-If asked about membership, list all membership types, fees, and roles clearly.
 
 --- CONTEXT FROM DATABASE ---
 {context}
@@ -68,13 +70,22 @@ User Question: {user_query}
 Answer:"""
 
     try:
+        # Standard stable model identifier for Google GenAI SDK
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt
+            model="gemini-3.5-flash-lite", 
+            contents=prompt,
+            config={"temperature": 0.2}
         )
         answer_text = response.text
+
     except Exception as e:
-        print(f"❌ GEMINI ERROR: {e}")
+        print("\n" + "🚨"*15 + " BACKEND ERROR DETECTED " + "🚨"*15)
+        print(f"Error Type: {type(e).__name__}")
+        print(f"Error Message: {e}")
+        print("-" * 50)
+        traceback.print_exc()
+        print("🚨"*38 + "\n")
+        
         answer_text = "I am having trouble processing your request right now. Please try again."
 
     return {"messages": [AIMessage(content=answer_text)]}

@@ -4,8 +4,8 @@ def retrieve_similar_documents(query: str) -> str:
     try:
         vs = get_vectorstore()
         
-        # Search using MMR to ensure diverse & high-relevant context retrieval
-        docs = vs.max_marginal_relevance_search(query, k=8, fetch_k=20)
+        # Fast & lightweight similarity search (k=3 or 4)
+        docs = vs.similarity_search(query, k=4)
         
         if not docs:
             print("DEBUG: [Retriever] Zero documents returned!")

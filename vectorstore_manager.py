@@ -8,7 +8,7 @@ EMBEDDING_MODEL = "all-MiniLM-L6-v2"
 def get_vectorstore():
     embeddings = HuggingFaceEmbeddings(model_name=EMBEDDING_MODEL)
     
-    # Ensure directory exists on server
+    # Ensure directory exists
     os.makedirs(CHROMA_PATH, exist_ok=True)
     
     vectorstore = Chroma(

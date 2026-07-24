@@ -10,11 +10,5 @@
         "session_id": "session_1784543566069",
         "query": "What is the complete contact address and phone number of the AEHSAS Foundations owner?",
         "status": "pending_review"
-    },
-    {
-        "timestamp": "2026-07-24T00:19:13.023510",
-        "session_id": "perf_test_2",
-        "query": "How can I contact the admin?",
-        "status": "pending_review"
     }
 ]

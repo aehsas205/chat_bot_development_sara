@@ -1,135 +1,84 @@
 import os
-import requests
-from bs4 import BeautifulSoup
-from langchain_core.documents import Document
-from langchain_community.document_loaders import PyMuPDFLoader
+import shutil
+import glob
+from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from vectorstore_manager import get_vectorstore
+from vectorstore_manager import get_vectorstore, CHROMA_PATH
 
-# 1. Configuration
-URL = "https://aehsasfoundation.org/"
-PDF_PATH = "Chatbot training data.pdf"
+def clear_vectorstore():
+    """Wipes the existing Chroma database if explicitly called."""
+    if os.path.exists(CHROMA_PATH):
+        try:
+            shutil.rmtree(CHROMA_PATH)
+            print("🧹 Old database cleared successfully!")
+        except Exception as e:
+            print(f"⚠️ Warning clearing vectorstore: {e}")
 
-def fetch_website_content(url):
-    print(f"Fetching content from {url}...")
-    headers = {'User-Agent': 'Mozilla/5.0'}
+def process_and_embed_all():
+    """Reads PDF & Website, chunks text, and embeds into persistent ChromaDB."""
+    clear_vectorstore()
+    
+    documents = []
+    
+    # 1. Scrape Website
     try:
-        response = requests.get(url, headers=headers)
-        if response.status_code != 200:
-            print(f"Error fetching website: Status {response.status_code}")
-            return None
-
-        soup = BeautifulSoup(response.content, 'html.parser')
-        for script_or_style in soup(["script", "style", "header", "footer", "nav"]):
-            script_or_style.decompose()
-
-        text = soup.get_text(separator=' ')
-        lines = (line.strip() for line in text.splitlines())
-        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-        return '\n'.join(chunk for chunk in chunks if chunk)
+        print("🌐 Fetching content from website...")
+        loader = WebBaseLoader("https://aehsasfoundation.org/")
+        web_docs = loader.load()
+        documents.extend(web_docs)
+        print("✅ Website content extracted!")
     except Exception as e:
-        print(f"Website scraping failed: {e}")
-        return None
+        print(f"⚠️ Website scraping error: {e}")
 
-# Get VectorStore Instance
-vectorstore = get_vectorstore()
+    # 2. Load Local PDF(s)
+    pdf_files = glob.glob("*.pdf") + glob.glob("uploads/*.pdf")
+    for pdf_path in pdf_files:
+        try:
+            print(f"📄 Loading PDF: {pdf_path}...")
+            loader = PyPDFLoader(pdf_path)
+            pdf_docs = loader.load()
+            documents.extend(pdf_docs)
+            print(f"✅ PDF '{pdf_path}' processed successfully!")
+        except Exception as e:
+            print(f"⚠️ PDF processing error for {pdf_path}: {e}")
 
-# Clear Old Database Collection cleanly
-try:
-    coll = vectorstore._collection
-    all_ids = coll.get()["ids"]
-    if all_ids:
-        coll.delete(ids=all_ids)
-        print("🧹 Old database cleared successfully!")
-except Exception as e:
-    print(f"Database clear note: {e}")
+    if not documents:
+        print("⚠️ No documents found to embed!")
+        return 0
 
-all_chunks = []
-
-# --- PART 1: WEBSITE CONTENT ---
-clean_text = fetch_website_content(URL)
-if clean_text:
-    print("🌐 Website content extracted!")
-    doc = Document(page_content=clean_text, metadata={"source": URL})
-    # Optimized chunk size to preserve full paragraphs
-    web_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-    all_chunks.extend(web_splitter.split_documents([doc]))
-
-# --- PART 2: PDF CONTENT ---
-if os.path.exists(PDF_PATH):
-    print(f"📄 Loading PDF: {PDF_PATH}...")
-    pdf_loader = PyMuPDFLoader(PDF_PATH)
-    pdf_docs = pdf_loader.load()
-    
-    # Larger chunk_size ensures full membership definitions stay in a single chunk
-    # RecursiveCharacterTextSplitter update karein
-    pdf_splitter = RecursiveCharacterTextSplitter( chunk_size=1500, chunk_overlap=300, separators=["\n\n", "\n", " ", ""])
-    all_chunks.extend(pdf_splitter.split_documents(pdf_docs))
-    print("📄 PDF content processed with optimal chunks!")
-else:
-    print(f"⚠️ Warning: PDF file '{PDF_PATH}' not found!")
-
-# --- PART 3: EMBED EVERYTHING TO CHROMADB ---
-if all_chunks:
-    print(f"Embedding total {len(all_chunks)} chunks (Website + PDF) into ChromaDB...")
-    vectorstore.add_documents(all_chunks)
-    print("✅ Success! Both Website and PDF content are now stored with full context in ChromaDB.")
-else:
-    print("❌ No content found to embed.")
-
-
-
-
-
-def process_and_embed_pdf(pdf_file_path: str):
-    """
-    Processes a single uploaded PDF file and appends its embeddings to ChromaDB.
-    """
-    if not os.path.exists(pdf_file_path):
-        raise FileNotFoundError(f"PDF file not found at path: {pdf_file_path}")
-
-    print(f"📄 Processing newly uploaded PDF: {pdf_file_path}...")
-    
-    # Load PDF
-    pdf_loader = PyMuPDFLoader(pdf_file_path)
-    pdf_docs = pdf_loader.load()
-
-    if not pdf_docs:
-        raise ValueError("The uploaded PDF is empty or could not be read.")
-
-    # Split into chunks (same optimal chunk size)
-    pdf_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1500,
-        chunk_overlap=300,
-        separators=["\n\n", "\n", " ", ""]
+    # 3. Text Chunking (Optimized chunk size & overlap)
+    text_splitter = RecursiveCharacterTextSplitter(
+        chunk_size=800,
+        chunk_overlap=150
     )
-    pdf_chunks = pdf_splitter.split_documents(pdf_docs)
+    chunks = text_splitter.split_documents(documents)
 
-    # Embed & Add to ChromaDB
-    vs = get_vectorstore()
-    vs.add_documents(pdf_chunks)
+    # 4. Save to Persistent ChromaDB
+    vectorstore = get_vectorstore()
+    vectorstore.add_documents(chunks)
     
-    print(f"✅ Successfully embedded {len(pdf_chunks)} chunks from '{os.path.basename(pdf_file_path)}' into ChromaDB!")
-    return len(pdf_chunks)
+    print(f"✅ Success! Embedded total {len(chunks)} chunks into ChromaDB.")
+    return len(chunks)
 
-
-
-
-
-#----------------------------------------------#
-# update any changes in website
-#----------------------------------------------#
-def reindex_website_only():
-    """Fetches latest website content and updates ChromaDB embeddings."""
-    print("🌐 Re-indexing website content...")
-    clean_text = fetch_website_content(URL)
-    if clean_text:
-        doc = Document(page_content=clean_text, metadata={"source": URL})
-        web_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
-        web_chunks = web_splitter.split_documents([doc])
+def process_and_embed_pdf(pdf_path):
+    """Processes a single uploaded PDF for Admin Panel without wiping existing DB."""
+    try:
+        loader = PyPDFLoader(pdf_path)
+        docs = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=150)
+        chunks = text_splitter.split_documents(docs)
         
-        vs = get_vectorstore()
-        vs.add_documents(web_chunks)
-        print(f"✅ Re-indexed {len(web_chunks)} website chunks into ChromaDB!")
-        return len(web_chunks)
-    return 0
+        vectorstore = get_vectorstore()
+        vectorstore.add_documents(chunks)
+        return len(chunks)
+    except Exception as e:
+        print(f"Error processing PDF {pdf_path}: {e}")
+        raise e
+
+def reindex_website_only():
+    """Re-indexes website content."""
+    return process_and_embed_all()
+
+# Guard Statement: Runs ONLY when executed manually via terminal
+if __name__ == "__main__":
+    process_and_embed_all()

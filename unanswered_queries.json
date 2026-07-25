@@ -30,15 +30,9 @@
         "status": "pending_review"
     },
     {
-        "timestamp": "2026-07-24T17:07:31.245198",
-        "session_id": "perf_test_2",
-        "query": "How can I contact the admin?",
-        "status": "pending_review"
-    },
-    {
-        "timestamp": "2026-07-24T18:47:42.893733",
-        "session_id": "perf_test_2",
-        "query": "How can I contact the admin?",
+        "timestamp": "2026-07-25T12:28:16.493230",
+        "session_id": "7f3e93f2-def8-4f1c-9dcd-7ec188bef764",
+        "query": "If I donate \u20b91000, how does it help?",
         "status": "pending_review"
     }
 ]

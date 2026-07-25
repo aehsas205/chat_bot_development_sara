@@ -103,7 +103,7 @@ async def chat_endpoint(data: ChatRequest, request: Request, response: Response)
         fallback_keywords = [
             "don't know", "don't have information", "not sure", 
             "unable to find", "pata nahi", "sorry, i cannot",
-            "does not contain", "cannot answer", "no information", "not available", "not provided", "provided database context"
+            "does not contain", "cannot answer", "no information", "not available", "not provided", "provided database context", "not mention", "no mention"
         ]
         
         if any(keyword in reply.lower() for keyword in fallback_keywords):

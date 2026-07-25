@@ -11,6 +11,7 @@ from langchain_core.messages import AIMessage
 
 from retriever import retrieve_similar_documents
 from feedback import handle_feedback  # 👈 Import handle_feedback
+from mcp_client import check_and_run_mcp_tools  # 👈 Import non-blocking MCP tool handler
 
 load_dotenv()
 SENDER_EMAIL = os.getenv("SENDER_EMAIL")
@@ -43,7 +44,12 @@ def chatmodel(state: State):
     print("\n" + "="*50)
     print(f"[DEBUG USER QUERY RECEIVED]: '{user_query}'")
     
-    # Retrieve Context
+    # 1. Safe & Fast MCP Tools Check (Non-blocking)
+    mcp_extra_context = check_and_run_mcp_tools(user_query)
+    if mcp_extra_context:
+        print(f"[DEBUG MCP DATA RETRIEVED]: {mcp_extra_context.strip()}")
+
+    # 2. Retrieve Vector DB Context (RAG)
     context = retrieve_similar_documents(user_query)
     print(f"[DEBUG CONTEXT LENGTH RETRIEVED]: {len(context)} characters")
     print("="*50 + "\n")
@@ -52,8 +58,10 @@ def chatmodel(state: State):
     if not context or len(context) < 20:
         context = retrieve_similar_documents("membership types fees General Member Lifetime Member Patron Special")
 
+    # 3. Combined Prompt for Gemini
+    # 3. Combined Prompt for Gemini
     prompt = f"""You are the official AI Assistant for AEHSAS Foundation.
-Answer the user question accurately using ONLY the provided database context below.
+Answer the user question accurately using the provided database context and MCP Tool data below.
 If asked about membership, list all membership types, fees, and roles clearly.
 
 CRITICAL LANGUAGE RULE:
@@ -62,9 +70,10 @@ Always respond in the EXACT same language and script used by the user in their q
 - If the user asks in Hindi script (e.g., हिंदी), respond in Hindi script.
 - If the user asks in English or Roman script, respond in English or Roman script.
 
---- CONTEXT FROM DATABASE ---
+--- CONTEXT FROM DATABASE & TOOLS ---
 {context}
------------------------------
+{mcp_extra_context}
+------------------------------------
 
 User Question: {user_query}
 Answer:"""

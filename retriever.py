@@ -1,4 +1,4 @@
-
+from vectorstore_manager import get_vectorstore
 
 def retrieve_similar_documents(query: str) -> str:
     """

@@ -10,7 +10,7 @@ def retrieve_similar_documents(query: str) -> str:
         vs = get_vectorstore()
         
         # Increased k=12 to ensure chunks across multiple pages/documents are fetched
-        docs = vs.similarity_search(query, k=12)
+        docs = vs.similarity_search(query, k=10)
         
         query_lower = query.lower()
         team_triggers = ["post", "holder", "team", "leader", "executive", "office", "bearer", "member", "who are", "roster", "incumbent"]

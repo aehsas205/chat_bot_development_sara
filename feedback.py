@@ -19,7 +19,7 @@ def handle_feedback(feedback_intent: Literal["positive", "negative", "wants_huma
     elif feedback_intent == "negative":
         return "I'm sorry it wasn't helpful. Would you like to speak to a human representative?"
     elif feedback_intent == "wants_human":
-        return "You can fill out this form to contact a human representative: https://aehsasfoundation.com/contact-us"
+        return "You can fill out this form to contact a human representative: https://aehsasfoundation.org/contact"
 
 
 # --- Unanswered Query Logging & Admin Notification ---

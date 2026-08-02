@@ -27,3 +27,8 @@ for i, query in enumerate(test_queries, 1):
     print(f"Status: {status} | Latency: {elapsed:.2f} seconds\n")
 
 avg_latency = total_time / len(test_queries)
+print("="*50)
+print(f"🎯 Benchmark Results Summary:")
+print(f"• Average Response Latency: {avg_latency:.2f} seconds")
+print(f"• Target Standard: < 3.0 seconds")
+print("="*50 + "\n")

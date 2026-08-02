@@ -42,4 +42,3 @@ for idx, case in enumerate(test_cases, 1):
     except Exception as e:
         print(f"Status: ❌ ERROR ({e})")
 
-print("\n" + "="*50 + "\nAccuracy Check Completed!")

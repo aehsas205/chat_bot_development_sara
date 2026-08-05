@@ -17,7 +17,7 @@ try:
             print(f"--- Document {i+1} ---")
             print(text[:300])  # Pehle 300 characters print karein
             print("-" * 40)
-    print("================================================\n")
+    
 
 except Exception as e:
     print("Error reading ChromaDB:", e)

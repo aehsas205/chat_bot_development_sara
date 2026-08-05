@@ -19,5 +19,3 @@ try:
             print("-" * 40)
     print("================================================\n")
 
-except Exception as e:
-    print("Error reading ChromaDB:", e)

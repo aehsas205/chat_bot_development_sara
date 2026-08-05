@@ -100,5 +100,17 @@
         "session_id": "7f3e93f2-def8-4f1c-9dcd-7ec188bef764",
         "query": "How many total scholarships are recorded under the Technical Statistics of AEHSAS Foundation?",
         "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-05T19:33:48.694464",
+        "session_id": "session_1785931084240",
+        "query": "What educational institutions does AEHSAS aim to establish?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-05T19:34:01.697167",
+        "session_id": "session_1785931084240",
+        "query": "What educational institutions does AEHSAS aim to establish?",
+        "status": "pending_review"
     }
 ]

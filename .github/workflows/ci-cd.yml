@@ -2,9 +2,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "develop" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "develop" ]
 
 jobs:
   build-and-test:
@@ -30,7 +30,7 @@ jobs:
 
     # --- 🚀 CD Step (Continuous Deployment) ---
     - name: Trigger Render Deployment (CD)
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
       run: |
         echo "CI Passed! Triggering Deployment..."
         curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}

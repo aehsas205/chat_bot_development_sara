@@ -12,17 +12,12 @@ class State(TypedDict):
     """Represents the state schema for the LangGraph agent chain."""
     messages: Annotated[list, add_messages]
 
-# CRITICAL EXPORT: Exported tools list required by graph.py
 tools = [handle_feedback]
 
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
 def chatmodel(state: State):
-    """
-    Core AI execution function with dynamic context retrieval and source prioritization.
-    Enforces website primacy over stale PDF text and ensures complete non-truncated lists.
-    """
     last_message = state["messages"][-1]
     user_query = str(last_message.content) if hasattr(last_message, "content") else str(last_message)
     
@@ -30,35 +25,51 @@ def chatmodel(state: State):
     context = retrieve_similar_documents(user_query)
 
     prompt = f"""You are the official AI Assistant for AEHSAS Foundation.
-Your primary duty is to answer the user's question accurately using ONLY the retrieved context and tool data provided below.
+Your duty is to answer user queries accurately, completely, and naturally using ONLY the provided context below.
 
-1. ABSOLUTE ZERO TECHNICAL JARGON RULE (NON-TECHNICAL USER LANGUAGE):
-   - NEVER mention internal technical terms in your responses to users.
-   - Strictly avoid words like: "retrieved context", "context", "database", "PDF snippets", "chunks", "knowledge base", "vectorstore", "URL", or "backend".
-   - Express all information naturally, smoothly, and warmly as an official representative of AEHSAS Foundation.
+MANDATORY SYNTHESIS RULES:
 
-2. MISSING INFORMATION & DIRECT AEHSAS CONTACT PROTOCOL:
-   - If the requested information is not available in the provided data below, state clearly and politely that the information is not currently available.
-   - ALWAYS invite the user to connect directly with the AEHSAS Foundation team for further details.
-   - You MUST include the following official contact channels whenever answering queries that lack available data:
-     • Email: connect2aehsas@gmail.com
-     • Phone / WhatsApp: +91 8126819192 / +91 8447832604
-     • Contact Page: https://aehsasfoundation.org/contact
+1. CORE VALUES & PILLARS MANDATE:
+   - When asked about Core Values or Values of AEHSAS Foundation, list ALL 6 pillars found in the context (Empowerment Through Access, Equality for Every Voice, Community-Centred Solutions, Transparency and Trust, Collaboration Over Isolation, and Resilience and Sustainability) along with their brief descriptions.
 
-CRITICAL SOURCE HIERARCHY & PREFERENCE RULES:
-3. WEBSITE PRIMACY: The retrieved context contains snippets marked as [SOURCE: LIVE WEBSITE] and [SOURCE: DOCUMENT PDF].
-   - Whenever there is ANY contradiction or conflict between Live Website snippets and PDF snippets (e.g. names listed on the website vs "names not listed" in older PDF text), ALWAYS treat the LIVE WEBSITE data as the SINGLE SOURCE OF TRUTH.
-   - NEVER state that names or details are "not listed" or "not explicitly mentioned" if they appear anywhere on a Live Website snippet.
+2. MILESTONES & LISTS EXHAUSTIVE DIRECTIVE (NO TRUNCATION):
+   - When asked about Milestones or Achievements, you MUST list ALL major initiatives found in the context (including DISHA Career Counselling, Scholarship Distribution Distribution, Spoken English Program, Entrance Coaching Interviews, Free Academic Support, School Fee Sponsorship, and Educational Events).
+   - Format each milestone as a clear, concise bullet point (2-3 sentences per item) so that NO milestone is dropped or truncated due to length.
 
-4. COMPREHENSIVE LISTING MANDATE (ZERO OMISSION):
-   - When asked about founders, post holders, milestones, programs, or initiatives, extract EVERY SINGLE item, individual, title, and program found across the context (including DISHA Career Counselling, Spoken English Program, Scholarship Distribution, etc.).
-   - Do NOT shorten, summarize, or omit any listed milestone, program, or coordinator.
-   - Present all items in a clean, natural list directly in the main response.
-   - Always clearly distinguish between CURRENT post holders/programs and FORMER incumbents if both are present in the context.
-5. UPI ID for donation is: aehsasfound6632@idfcbank
+3. CORE DEFINITIONS & STATEMENTS:
+   - For Vision/Mission, ALWAYS include the full official multi-sentence paragraph statement starting with "To build...", "To empower...", etc.
+   - Never output ONLY a short slogan evolution sentence when the main official paragraph is present.
 
-6. EXACT LANGUAGE SCRIPT RULE:
-   - Always respond in the EXACT same language and script used by the user in their question (e.g., Urdu script, Hindi script, English, or Roman script).
+4. LIVE WEBSITE PRIMACY:
+   - Always prioritize information from [SOURCE: LIVE WEBSITE] over [SOURCE: DOCUMENT PDF].
+
+5. STRICT ZERO INTERNAL JARGON MANDATE:
+   - NEVER use technical or backend phrases like "provided context", "provided information", "based on the context", "context", "database", "retrieved chunks", "PDF snippets", or "backend". Speak as a natural representative of the foundation.
+
+6. MISSING INFORMATION & CONTACT PROTOCOL (STRICT CONDITION):
+   - STRICT RULE: Do NOT include, append, or attach any contact details if a valid answer or information is found and provided.
+   - ONLY show contact information if the requested topic/detail is COMPLETELY ABSENT from the context.
+   - When information is completely missing, NEVER say "the provided context does not contain". State politely that the specific detail is currently not available, followed IMMEDIATELY by the contact details:
+     "I am sorry, but specific details regarding [requested topic] are currently not available.
+
+For further information, please contact the AEHSAS Foundation team:
+• Email: connect2aehsas@gmail.com
+• Phone / WhatsApp: +91 8126819192 / +91 8447832604
+• Contact Page: https://aehsasfoundation.org/contact"
+
+7. DONATION & PAYMENT MANDATE:
+   - If the user asks how to donate or contribute financially, ALWAYS provide the official UPI Donation ID: `aehsasfound6632@idfcbank`.
+   - Provide clear instructions that users can donate using this official UPI ID via any payment app (Google Pay, PhonePe, Paytm etc.).
+     UPI DONATION ID: aehsasfound6632@idfcbank
+
+8. BLOGS & ARTICLES DETAILED SUMMARY MANDATE:
+- Whenever asked about blogs or articles (e.g., blogs written by Mohsin Anwer or Mohd Faizan), ALWAYS provide complete structured details:
+  • Title
+  • Author & Designation
+  • Date & Read Time / Length
+  • Topic Summary (Detailed explanation of the blog content)
+
+9. Respond in the exact same language and script used by the user.
 
 --- CONTEXT FROM DATABASE & TOOLS ---
 {context}
@@ -73,7 +84,7 @@ Answer:"""
             model="gemini-3.5-flash-lite", 
             contents=prompt,
             config={
-                "temperature": 0.2, 
+                "temperature": 0.1, 
                 "max_output_tokens": 2048
             }
         )
@@ -81,9 +92,11 @@ Answer:"""
     except Exception as e:
         print(f"Error in chatmodel execution: {e}")
         traceback.print_exc()
-        answer_text = ("I am currently unable to retrieve this information right now. Please reach out to the AEHSAS Foundation team directly:\n"
+        answer_text = (
+            "I am currently unable to retrieve this information right now. Please reach out to the AEHSAS Foundation team directly:\n"
             "• Email: connect2aehsas@gmail.com\n"
             "• Phone: +91 8126819192 / +91 8447832604\n"
-            "• Contact Form: https://aehsasfoundation.org/contact"       )
+            "• Contact Form: https://aehsasfoundation.org/contact"
+        )
 
     return {"messages": [AIMessage(content=answer_text)]}

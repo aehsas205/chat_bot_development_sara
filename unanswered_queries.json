@@ -112,5 +112,209 @@
         "session_id": "session_1785931084240",
         "query": "What educational institutions does AEHSAS aim to establish?",
         "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:29:01.912287",
+        "session_id": "session_1785931084240",
+        "query": "uvicorn main:app --reload",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:29:22.096281",
+        "session_id": "session_1785931084240",
+        "query": "What is the educational background of Mohammad azeem khan?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:33:11.480361",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:35:42.410997",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:37:04.834639",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:43:38.674580",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:47:42.807952",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T18:53:57.793217",
+        "session_id": "session_1785931084240",
+        "query": "who will be the next president of aehsas",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T19:23:16.346496",
+        "session_id": "session_1785931084240",
+        "query": "who will be the next president of aehsas",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T19:24:00.465408",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T19:24:33.861556",
+        "session_id": "session_1785931084240",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T20:08:35.629136",
+        "session_id": "session_1785931084240",
+        "query": "blog written by mohsin anwar",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T20:11:33.876000",
+        "session_id": "session_1785931084240",
+        "query": "blog written by mohsin anwar",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T20:11:41.062930",
+        "session_id": "session_1785931084240",
+        "query": "blog written by mohsin anwar",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T20:11:49.657008",
+        "session_id": "session_1785931084240",
+        "query": "blog written by mohsin anwar",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:03:44.939903",
+        "session_id": "session_1786115221967",
+        "query": "what is the Milestone of Aehsas foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:13:00.028708",
+        "session_id": "session_1786117314844",
+        "query": "What is the educational background of Mohammad azeem khan?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:14:03.535173",
+        "session_id": "session_1786117314844",
+        "query": "what is the Milestone of Aehsas foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:15:05.597426",
+        "session_id": "session_1786117314844",
+        "query": "what is the Milestones of Aehsas foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:15:45.643623",
+        "session_id": "session_1786117314844",
+        "query": "achievements of aehsas foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:16:04.922736",
+        "session_id": "session_1786117314844",
+        "query": "events organized by aehsas foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T21:57:26.704117",
+        "session_id": "session_1786119856709",
+        "query": "What is the educational background of Mohammad azeem khan?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T22:01:18.147422",
+        "session_id": "session_1786119856709",
+        "query": "What is the educational background of Mohammad azeem khan?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T22:09:08.081098",
+        "session_id": "session_1786119856709",
+        "query": "How can someone donate to AEHSAS Foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T22:16:38.258035",
+        "session_id": "session_1786119856709",
+        "query": "How can someone donate to AEHSAS Foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T22:21:08.133104",
+        "session_id": "session_1786119856709",
+        "query": "what are the Privacy Policy of AAEHSAS foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T22:55:15.866025",
+        "session_id": "session_1786119856709",
+        "query": "Values of Aehsas Foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T22:59:17.150126",
+        "session_id": "session_1786119856709",
+        "query": "Values of Aehsas Foundation?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T23:08:57.643207",
+        "session_id": "session_1786119856709",
+        "query": "Name some vocational training programs offered by AEHSAS",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T23:15:52.614066",
+        "session_id": "session_1786119856709",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T23:20:10.374435",
+        "session_id": "session_1786119856709",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T23:20:18.605880",
+        "session_id": "session_1786119856709",
+        "query": "What digital skills training does AEHSAS offer?",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T23:48:47.901096",
+        "session_id": "session_1786119856709",
+        "query": "press releases published by aehsas",
+        "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-07T23:50:15.722904",
+        "session_id": "session_1786119856709",
+        "query": "who will be the next president of aehsas",
+        "status": "pending_review"
     }
 ]

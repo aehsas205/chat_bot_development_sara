@@ -1,4 +1,4 @@
-# Aehsaas Foundation Chatbot - Documentation
+# Aehsaas Foundation Chatbot :- Documentation
 
 ## Project Overview
 This is a FastAPI-based chatbot application for the Aehsaas Foundation, a nonprofit humanitarian organization. The chatbot uses RAG (Retrieval-Augmented Generation) to provide accurate information about the foundation's services, programs, and activities.

@@ -83,6 +83,7 @@ Answer:"""
         traceback.print_exc()
         answer_text = ("I am currently unable to retrieve this information right now. Please reach out to the AEHSAS Foundation team directly:\n"
             "• Email: connect2aehsas@gmail.com\n"
-                        )
+            "• Phone: +91 8126819192 / +91 8447832604\n"
+                     )
 
     return {"messages": [AIMessage(content=answer_text)]}

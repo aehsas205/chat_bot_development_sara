@@ -82,6 +82,7 @@ Answer:"""
         print(f"Error in chatmodel execution: {e}")
         traceback.print_exc()
         answer_text = ("I am currently unable to retrieve this information right now. Please reach out to the AEHSAS Foundation team directly:\n"
-            )
+            "• Email: connect2aehsas@gmail.com\n"
+                        )
 
     return {"messages": [AIMessage(content=answer_text)]}

@@ -33,4 +33,4 @@ jobs:
       if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
       run: |
         echo "CI Passed! Triggering Deployment..."
-        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"

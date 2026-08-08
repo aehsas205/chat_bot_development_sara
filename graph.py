@@ -3,7 +3,6 @@ from langgraph.prebuilt import ToolNode, tools_condition
 from chatbot import chatmodel, tools, State
 from config import memory
 
-# Initialize the graph builder with the correct State schema
 graph_builder = StateGraph(State)
 
 tool_node = ToolNode(tools=tools)

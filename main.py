@@ -19,7 +19,7 @@ from scrape_and_embed import process_and_embed_pdf, reindex_website_only
 
 app = FastAPI(title="AEHSAS Foundation Chatbot API")
 
-# CORS Setup
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,7 +32,7 @@ class ChatRequest(BaseModel):
     user_input: str
     session_id: str = None
 
-# Absolute path resolution for Render deployment
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 HTML_PATH = os.path.join(BASE_DIR, "samp.html")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -80,7 +80,7 @@ async def chat_endpoint(data: ChatRequest, request: Request, response: Response)
         config = {"configurable": {"thread_id": session_id}}
         user_message = HumanMessage(content=cleaned_input)
 
-        # Invoke LangGraph
+        
         response_obj = await asyncio.to_thread(
             graph.invoke,
             {"messages": [user_message]},

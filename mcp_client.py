@@ -32,6 +32,7 @@ def search_emergency_service(service_type: str) -> str:
     return f"EMERGENCY PROTOCOL ACTIVATED for [{service_type.upper()}]: Please call the 24/7 AEHSAS Emergency Desk immediately at +91-9876543210."
 
 def check_and_run_mcp_tools(user_query: str) -> str:
+    
     """Safely checks user query and runs MCP tool logic without blocking the server."""
     extra_context = ""
     query_lower = user_query.lower()

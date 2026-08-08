@@ -105,7 +105,8 @@ def fetch_web_document_dynamic(url: str) -> Document:
         driver.get(url)
         time.sleep(3)
         
-        # Trigger page scroll to animate counter numbers and lazy load cards
+
+        
         driver.execute_script("""
             let totalHeight = 0;
             let distance = 300;
@@ -121,7 +122,7 @@ def fetch_web_document_dynamic(url: str) -> Document:
         """)
         time.sleep(3)
         
-        # Trigger next clicks on dynamic carousels (Testimonials) to unveil hidden slide DOM
+        
         driver.execute_script("""
             let nextBtns = document.querySelectorAll('.slick-next, .swiper-button-next, button[aria-label*="next"], .carousel-control-next');
             nextBtns.forEach(btn => {
@@ -134,7 +135,7 @@ def fetch_web_document_dynamic(url: str) -> Document:
 
         rendered_text = driver.execute_script("return document.body.innerText;")
         
-        # Parse hydrated page source using BeautifulSoup to extract all DOM elements
+        
         hydrated_soup = BeautifulSoup(driver.page_source, "html.parser")
         for element in hydrated_soup(["script", "style", "noscript", "svg"]):
             element.decompose()

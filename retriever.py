@@ -9,11 +9,11 @@ def retrieve_similar_documents(query: str) -> str:
         vs = get_vectorstore()
         query_lower = query.lower()
         
-        # 1. Primary Semantic Search
+         
         docs = vs.similarity_search(query, k=35)
         existing_contents = {d.page_content for d in docs}
         
-        # 2. Candidate Expansion for Milestones & Initiatives (Includes DISHA)
+        
         if any(w in query_lower for w in ["milestone", "milestones", "achievement", "achievements", "program", "events", "disha"]):
             extra = vs.similarity_search(
                 "DISHA Career Counselling January 21 2026 AEHSAS Foundation milestones Academic Session Entrance Coaching Free Academic Support Educational Events School Fee Sponsorship Scholarship Spoken English", 
@@ -24,7 +24,7 @@ def retrieve_similar_documents(query: str) -> str:
                     docs.append(d)
                     existing_contents.add(d.page_content)
 
-        # 3. Candidate Expansion for Vision/Mission/Motto
+        
         if any(w in query_lower for w in ["value", "values","vision", "mission", "motto", "aim"]):
             extra = vs.similarity_search("Vision To build a future-ready inclusive compassionate society education social justice", k=5)
             for d in extra:
@@ -32,7 +32,7 @@ def retrieve_similar_documents(query: str) -> str:
                     docs.append(d)
                     existing_contents.add(d.page_content)
         
-        # Candidate Expansion for Blogs (Includes both Mohsin Anwer & Mohd Faizan blogs)
+        
         if any(w in query_lower for w in ["blog", "blogs", "article", "articles", "mohsin", "faizan", "privilege"]):
             extra = vs.similarity_search(
                 "When Privilege Becomes Purpose Why Helping the Underserved Strengthens Everyone Including You Mohd Faizan Co-Founder Secretary 4 min read The Perils of Artificial Intelligence Mohsin Anwer 9 min read", 
@@ -47,7 +47,7 @@ def retrieve_similar_documents(query: str) -> str:
             print("DEBUG: [Retriever] Zero documents returned!")
             return ""
 
-        # 5. Live Website Primacy Sorting
+        
         docs.sort(key=lambda d: 0 if (d.metadata.get("is_website", False) or str(d.metadata.get("source", "")).startswith("http")) else 1)
 
         formatted_chunks = []

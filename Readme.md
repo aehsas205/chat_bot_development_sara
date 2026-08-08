@@ -95,7 +95,7 @@ Then open `http://localhost:3000/samp.html` in your browser
 ### 2. Configuration (`config.py`)
 - **System Message**: Defines the chatbot's behavior and scope
 - **Memory Management**: Session-based conversation memory using LangGraph checkpointer
-- **Session ID**: Unique identifier for each user session
+
 
 ### 3. Chatbot Engine (`chatbot.py`)
 - **LLM Setup**: Google Gemini 3.1 Flash Lite model
@@ -132,11 +132,9 @@ Then open `http://localhost:3000/samp.html` in your browser
 - Handles Hindi queries by translating to English for processing
 - Returns responses in the original language
 
-### 3. Session Management
-- Maintains conversation context across multiple interactions
-- Automatic cleanup of inactive sessions (60 minutes)
 
-### 4. Feedback System
+
+### 3. Feedback System
 - Built-in feedback handling for user interactions
 - Supports positive, negative, and human assistance requests
 
@@ -183,9 +181,7 @@ curl -X POST "http://localhost:8000/chat" \
    uvicorn main:app --reload --port 8001
    ```
 
-4. **Memory Issues**: The application uses significant memory for embeddings
-   - Ensure sufficient RAM (4GB+ recommended)
-   - Monitor memory usage during document processing
+
 
 ### Debug Mode:
 Enable debug logging by modifying the logging level in `main.py`:
@@ -196,8 +192,7 @@ logging.basicConfig(level=logging.DEBUG)
 ## Security Considerations
 
 1. **API Keys**: Never commit API keys to version control
-2. **Session Management**: Sessions expire after 60 minutes of inactivity
-3. **CORS**: Configured to allow localhost:3000 for web interface
+
 
 ## Performance Optimization
 
@@ -215,10 +210,3 @@ logging.basicConfig(level=logging.DEBUG)
 - Session-based memory maintains conversation context
 - Automatic RAG pipeline warm-up on server startup
 
-## Support
-
-For issues or questions:
-1. Check the troubleshooting section
-2. Review the code comments for implementation details
-3. Monitor the console output for error messages
-4. Ensure all dependencies are correctly installed

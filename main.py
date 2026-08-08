@@ -1,3 +1,8 @@
+"""
+AEHSAS Foundation AI Assistant - FastAPI Backend Server
+======================================================
+"""
+
 import os
 import time
 import asyncio
@@ -9,11 +14,13 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 
+# Load environment configuration
 from dotenv import load_dotenv
 load_dotenv()
 
 from graph import graph
 from feedback import store_unanswered_query, send_error_notification, send_email_alert
+
 # 1. Added reindex_website_only import here
 from scrape_and_embed import process_and_embed_pdf, reindex_website_only
 
@@ -187,6 +194,7 @@ async def upload_pdf_and_reindex(
     except Exception as e:
         tb_str = traceback.format_exc()
         try:
+            
             send_error_notification(
                 error_type="AdminReindexError",
                 error_msg=str(e),

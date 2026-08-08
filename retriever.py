@@ -1,5 +1,14 @@
+"""
+AEHSAS Foundation AI Assistant - Vector DB Retriever
+===================================================
+"""
 from vectorstore_manager import get_vectorstore
 
+
+
+# ==========================================
+# UNIVERSAL RETRIEVAL FUNCTION
+# ==========================================
 def retrieve_similar_documents(query: str) -> str:
     """
     Robust Universal Retriever.
@@ -9,11 +18,14 @@ def retrieve_similar_documents(query: str) -> str:
         vs = get_vectorstore()
         query_lower = query.lower()
         
-         
+         # 1. Base Similarity Search Execution (Retrieves top 35 matching chunks)
         docs = vs.similarity_search(query, k=35)
         existing_contents = {d.page_content for d in docs}
         
-        
+        # ------------------------------------------------------------------
+        # 2. CANDIDATE EXPANSION 1: Milestones & Key Events
+        # Ensures all 7+ milestones (DISHA, Scholarships, Coaching) are retrieved.
+        # ------------------------------------------------------------------
         if any(w in query_lower for w in ["milestone", "milestones", "achievement", "achievements", "program", "events", "disha"]):
             extra = vs.similarity_search(
                 "DISHA Career Counselling January 21 2026 AEHSAS Foundation milestones Academic Session Entrance Coaching Free Academic Support Educational Events School Fee Sponsorship Scholarship Spoken English", 
@@ -24,7 +36,10 @@ def retrieve_similar_documents(query: str) -> str:
                     docs.append(d)
                     existing_contents.add(d.page_content)
 
-        
+        # ------------------------------------------------------------------
+        # 3. CANDIDATE EXPANSION 2: Vision, Mission & Core Values
+        # Guarantees retrieval of all 6 core pillars & official vision statement.
+        # ------------------------------------------------------------------
         if any(w in query_lower for w in ["value", "values","vision", "mission", "motto", "aim"]):
             extra = vs.similarity_search("Vision To build a future-ready inclusive compassionate society education social justice", k=5)
             for d in extra:
@@ -32,7 +47,10 @@ def retrieve_similar_documents(query: str) -> str:
                     docs.append(d)
                     existing_contents.add(d.page_content)
         
-        
+        # ------------------------------------------------------------------
+        # 4. CANDIDATE EXPANSION 3: Leadership Blogs & Articles
+        # Fetches full blog metadata (Title, Author, Read Time, and Topic Summary).
+        # ------------------------------------------------------------------
         if any(w in query_lower for w in ["blog", "blogs", "article", "articles", "mohsin", "faizan", "privilege"]):
             extra = vs.similarity_search(
                 "When Privilege Becomes Purpose Why Helping the Underserved Strengthens Everyone Including You Mohd Faizan Co-Founder Secretary 4 min read The Perils of Artificial Intelligence Mohsin Anwer 9 min read", 
@@ -42,12 +60,15 @@ def retrieve_similar_documents(query: str) -> str:
                 if d.page_content not in existing_contents:
                     docs.append(d)
                     existing_contents.add(d.page_content)
-
+        # Fallback handling for empty DB results
         if not docs:
             print("DEBUG: [Retriever] Zero documents returned!")
             return ""
 
-        
+        # ------------------------------------------------------------------
+        # 5. SOURCE PRIMACY SORTING
+        # Prioritizes Live Website chunks over PDF documents to enforce Rule #4.
+        # ------------------------------------------------------------------        
         docs.sort(key=lambda d: 0 if (d.metadata.get("is_website", False) or str(d.metadata.get("source", "")).startswith("http")) else 1)
 
         formatted_chunks = []

@@ -1,3 +1,6 @@
+""" ================================================
+AEHSAS Foundation AI Assistant - Core Chat Model
+================================================"""
 import os
 import traceback
 from typing import TypedDict, Annotated
@@ -14,9 +17,11 @@ class State(TypedDict):
 
 tools = [handle_feedback]
 
+# CLIENT & ENVIRONMENT INITIALIZATION
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
+# CORE CHAT MODEL
 def chatmodel(state: State):
     last_message = state["messages"][-1]
     user_query = str(last_message.content) if hasattr(last_message, "content") else str(last_message)
@@ -80,6 +85,7 @@ User Question: {user_query}
 Answer:"""
 
     try:
+        # # Generate response using gemini-3.5-flash-lite model
         response = client.models.generate_content(
             model="gemini-3.5-flash-lite", 
             contents=prompt,
@@ -90,6 +96,7 @@ Answer:"""
         )
         answer_text = response.text
     except Exception as e:
+        #Fallback handling in case of API failure or connectivity issues
         print(f"Error in chatmodel execution: {e}")
         traceback.print_exc()
         answer_text = (

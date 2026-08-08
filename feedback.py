@@ -1,3 +1,8 @@
+"""
+AEHSAS Foundation AI Assistant - Feedback & Alert Management
+============================================================
+"""
+
 import json
 import os
 import smtplib

@@ -15,6 +15,7 @@ Rules:
 
 memory = MemorySaver()
 
+# SESSION MANAGEMENT
 def get_or_create_session_id(request: Request, response: Response) -> str:
     session_id = request.headers.get("X-Session-ID")
     if not session_id:

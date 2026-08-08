@@ -1,3 +1,8 @@
+"""
+AEHSAS Foundation AI Assistant - Data Scraping & Vector Store Embedding Engine
+=============================================================================
+"""
+
 import os
 import shutil
 import glob
@@ -10,6 +15,10 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from vectorstore_manager import get_vectorstore, CHROMA_PATH
 
+# ==========================================
+# 1. VECTORSTORE MANAGEMENT UTILITY
+# ==========================================
+
 def clear_vectorstore():
     """Wipes the existing Chroma database before re-indexing to purge obsolete cache."""
     if os.path.exists(CHROMA_PATH):
@@ -18,6 +27,10 @@ def clear_vectorstore():
             print("🧹 Old Chroma database vectorstore cleared successfully!")
         except Exception as e:
             print(f"⚠️ Warning clearing vectorstore: {e}")
+
+# ==========================================
+# 2. WEB CRAWLING & DYNAMIC SCRAPING ENGINE
+# ==========================================            
 
 def discover_all_website_urls(base_url: str = "https://aehsasfoundation.org") -> list:
     """
@@ -49,7 +62,7 @@ def discover_all_website_urls(base_url: str = "https://aehsasfoundation.org") ->
                                 to_visit.add(clean_url)
             except Exception as e:
                 print(f"  ⚠️ Crawler notice fetching links from {url}: {e}")
-
+# Fallback explicit routes to guarantee coverage of critical pages
     fallback_urls = [
         f"{base_url}/",
         f"{base_url}/about",
@@ -183,6 +196,9 @@ def fetch_web_document_dynamic(url: str) -> Document:
         }
     )
 
+# ==========================================
+# 3. PROCESSING & EMBEDDING PIPELINE
+# ==========================================
 def process_and_embed_all():
     """
     Clears existing vector DB, automatically crawls and scrapes all website URLs,
@@ -202,7 +218,7 @@ def process_and_embed_all():
                 print(f"  ✅ Dynamically Scraped Website Page: {url}")
         except Exception as e:
             print(f"  ⚠️ Skipping {url}: {e}")
-
+    # Process all PDF documents in root and uploads/ directory
     pdf_files = glob.glob("*.pdf") + glob.glob("uploads/*.pdf")
     for pdf_path in pdf_files:
         try:
@@ -221,6 +237,8 @@ def process_and_embed_all():
     if not documents:
         print("⚠️ No documents found to embed!")
         return 0
+
+    # Large chunking configuration to preserve structural entity integrity
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=5000,

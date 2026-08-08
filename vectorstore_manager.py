@@ -1,8 +1,14 @@
+"""
+AEHSAS Foundation AI Assistant - Vector Store & Embedding Manager
+===============================================================
+""" 
 import os
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 
-# 🔑 Both variable names defined to prevent import errors anywhere in the project
+# ==========================================
+# 1. PATH CONFIGURATION & CONSTANTS
+# ==========================================
 PERSIST_DIR = "./chroma_index"
 CHROMA_PATH = "./chroma_index"
 

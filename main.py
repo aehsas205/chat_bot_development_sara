@@ -244,6 +244,10 @@ async def trigger_website_reindex(
 AEHSAS Foundation AI Assistant - FastAPI Application Entry Point
 ===============================================================
 """
+"""
+AEHSAS Foundation AI Assistant - FastAPI Application Entry Point
+===============================================================
+"""
 import os
 import uvicorn
 from fastapi import FastAPI, Request
@@ -252,7 +256,15 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
-from graph import app as agent_app
+# ⚡ Smart Import: Auto-detects variable name from graph.py
+try:
+    from graph import app as agent_app
+except ImportError:
+    try:
+        from graph import graph as agent_app
+    except ImportError:
+        from graph import workflow as agent_app
+
 from vectorstore_manager import get_vectorstore, PERSIST_DIR
 
 app = FastAPI(title="AEHSAS Foundation Chatbot API")
@@ -261,7 +273,6 @@ app = FastAPI(title="AEHSAS Foundation Chatbot API")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
 
-# Mount static files if directory exists
 static_dir = os.path.join(BASE_DIR, "static")
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
@@ -290,7 +301,7 @@ async def read_root(request: Request):
 
 @app.post("/chat")
 async def chat_endpoint(payload: QueryRequest):
-    """Handles user queries and streams/returns responses from LangGraph agent."""
+    """Handles user queries and returns responses from LangGraph agent."""
     try:
         user_message = payload.message.strip()
         if not user_message:

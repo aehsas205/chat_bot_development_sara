@@ -3,7 +3,7 @@ AEHSAS Foundation AI Assistant - FastAPI Backend Server
 ======================================================
 """
 
-import os
+"""import os
 import time
 import asyncio
 import shutil
@@ -238,4 +238,79 @@ async def trigger_website_reindex(
         except Exception as mail_err:
             print(f"⚠️ Failed to dispatch website reindex error email: {mail_err}")
 
-        raise HTTPException(status_code=500, detail=f"Failed to re-index website: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to re-index website: {str(e)}")"""
+
+"""
+AEHSAS Foundation AI Assistant - FastAPI Application Entry Point
+===============================================================
+"""
+import os
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+
+from graph import app as agent_app
+from vectorstore_manager import get_vectorstore, PERSIST_DIR
+
+app = FastAPI(title="AEHSAS Foundation Chatbot API")
+
+# Setup Templates & Static Files
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
+
+# Mount static files if directory exists
+static_dir = os.path.join(BASE_DIR, "static")
+if os.path.exists(static_dir):
+    app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
+
+class QueryRequest(BaseModel):
+    message: str
+
+
+@app.on_event("startup")
+async def startup_event():
+    """Ensure vectorstore is loaded without re-scraping or wiping database."""
+    print("🚀 Server starting up...")
+    if os.path.exists(PERSIST_DIR) and os.listdir(PERSIST_DIR):
+        print("✅ Pre-built ChromaDB index found! Loading existing vector store...")
+        get_vectorstore()
+    else:
+        print("⚠️ ChromaDB index not found! Please build index locally and push.")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    """Serves the main Chatbot UI page."""
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.post("/chat")
+async def chat_endpoint(payload: QueryRequest):
+    """Handles user queries and streams/returns responses from LangGraph agent."""
+    try:
+        user_message = payload.message.strip()
+        if not user_message:
+            return JSONResponse(status_code=400, content={"error": "Message cannot be empty."})
+
+        # Run state through LangGraph pipeline
+        inputs = {"messages": [("user", user_message)]}
+        result = agent_app.invoke(inputs)
+        
+        # Extract last message from agent response
+        last_msg = result["messages"][-1]
+        response_text = last_msg.content if hasattr(last_msg, "content") else str(last_msg)
+
+        return {"response": response_text}
+
+    except Exception as e:
+        print(f"Error processing chat request: {e}")
+        return JSONResponse(status_code=500, content={"error": "An error occurred while processing your request."})
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=True)

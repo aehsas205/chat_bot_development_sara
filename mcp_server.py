@@ -29,13 +29,13 @@ def send_receipt_email(email: str, amount_inr: float) -> str:
 @mcp.tool()
 def calculate_membership_fee(member_type: str, count: int = 1) -> str:
     """Calculates total fee for given membership type and count."""
-    fees = {"general": 500, "lifetime": 5000, "patron": 25000}
+    fees = {"general": 250, "lifetime": 501, "patron": 1001, "Position holder": 250}
     m_type = member_type.lower()
     for key, price in fees.items():
         if key in m_type:
             total = price * count
             return f"Total fee for {count} {key.capitalize()} Membership(s) is ₹{total:,.2f} (Base fee: ₹{price}/person)."
-    return "Standard Membership Fee: General = ₹500/yr, Lifetime = ₹5,000, Patron = ₹25,000."
+    return "Standard Membership Fee: General = ₹250/yr, Lifetime = ₹201, Patron = ₹1001, Position Holder = ₹250."
 
 # Tool 5: Emergency Blood & Health Lookup (NEW TOOL)
 @mcp.tool()

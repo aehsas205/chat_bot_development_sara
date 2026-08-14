@@ -264,8 +264,8 @@ def process_and_embed_pdf(pdf_path: str):
             p_doc.metadata["priority"] = 2
 
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=3000,
-            chunk_overlap=500
+            chunk_size=5000,
+            chunk_overlap=600
         )
         chunks = text_splitter.split_documents(pdf_docs)
 

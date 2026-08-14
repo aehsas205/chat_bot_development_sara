@@ -19,14 +19,14 @@ def send_receipt_email(email: str, amount_inr: float) -> str:
 
 def calculate_membership_fee(member_type: str, count: int = 1) -> str:
     """Calculates total membership fee."""
-    fees = {"general": 500, "lifetime": 5000, "patron": 25000}
+    fees = {"general": 250, "lifetime": 501, "patron": 1001, "Position holder": 250}
     m_type = member_type.lower()
     for key, price in fees.items():
         if key in m_type:
             total = price * count
             return f"Total fee for {count} {key.capitalize()} Membership(s) is ₹{total:,.2f} (Base fee: ₹{price}/person)."
-    return "Standard Membership Fee: General = ₹500/yr, Lifetime = ₹5,000, Patron = ₹25,000."
-
+    return "Standard Membership Fee: General = ₹250/yr, Lifetime = ₹201, Patron = ₹1001, Position Holder = ₹250."
+    
 def search_emergency_service(service_type: str) -> str:
     """Handles emergency service requests."""
     return f"EMERGENCY PROTOCOL ACTIVATED for [{service_type.upper()}]: Please call the 24/7 AEHSAS Emergency Desk immediately at +91-9876543210."

@@ -10,20 +10,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
-      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-      --card-bg: rgba(30, 41, 59, 0.7);
-      --card-border: rgba(255, 255, 255, 0.1);
+      --bg-gradient: linear-gradient(135deg, #062c1e 0%, #0f3d2e 50%, #062318 100%);
+      --card-bg: rgba(13, 43, 33, 0.82);
+      --card-border: rgba(52, 211, 153, 0.18);
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --primary-glow: rgba(99, 102, 241, 0.35);
-      --accent: #10b981;
-      --user-msg-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-      --bot-msg-bg: rgba(30, 41, 59, 0.85);
-      --bot-msg-border: rgba(255, 255, 255, 0.08);
-      --input-bg: rgba(15, 23, 42, 0.6);
-      --shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      --primary: #059669;
+      --primary-hover: #047857;
+      --primary-glow: rgba(16, 185, 129, 0.35);
+      --accent: #f59e0b;
+      --user-msg-bg: linear-gradient(135deg, #059669 0%, #047857 100%);
+      --bot-msg-bg: rgba(20, 54, 43, 0.9);
+      --bot-msg-border: rgba(52, 211, 153, 0.14);
+      --input-bg: rgba(6, 31, 23, 0.75);
+      --shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
     }
 
     * {
@@ -50,20 +50,20 @@
       border-radius: 50%;
       filter: blur(90px);
       z-index: 0;
-      opacity: 0.5;
+      opacity: 0.45;
       pointer-events: none;
     }
     .blob-1 {
       width: 400px;
       height: 400px;
-      background: #4f46e5;
+      background: #047857;
       top: -100px;
       left: -100px;
     }
     .blob-2 {
       width: 350px;
       height: 350px;
-      background: #059669;
+      background: #d97706;
       bottom: -100px;
       right: -100px;
     }
@@ -90,7 +90,7 @@
     /* Header */
     header {
       padding: 20px 28px;
-      background: rgba(15, 23, 42, 0.5);
+      background: rgba(6, 31, 23, 0.65);
       border-bottom: 1px solid var(--card-border);
       display: flex;
       justify-content: space-between;
@@ -107,13 +107,13 @@
       width: 46px;
       height: 46px;
       border-radius: 14px;
-      background: linear-gradient(135deg, #6366f1 0%, #10b981 100%);
+      background: linear-gradient(135deg, #059669 0%, #f59e0b 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 22px;
       color: #ffffff;
-      box-shadow: 0 0 20px var(--primary-glow);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
     }
 
     .brand-text h1 {
@@ -121,14 +121,14 @@
       font-size: 1.25rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-      background: linear-gradient(to right, #ffffff, #cbd5e1);
+      background: linear-gradient(to right, #ffffff, #a7f3d0);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
     .brand-text p {
       font-size: 0.82rem;
-      color: var(--text-muted);
+      color: #a7f3d0;
       display: flex;
       align-items: center;
       gap: 6px;
@@ -138,8 +138,8 @@
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background-color: var(--accent);
-      box-shadow: 0 0 8px var(--accent);
+      background-color: #34d399;
+      box-shadow: 0 0 8px #34d399;
       display: inline-block;
     }
 
@@ -152,8 +152,8 @@
     .btn-contact, .btn-clear {
       padding: 8px 14px;
       border-radius: 10px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       color: var(--text-main);
       font-size: 0.82rem;
       font-weight: 500;
@@ -165,16 +165,24 @@
       cursor: pointer;
     }
 
-    .btn-contact:hover, .btn-clear:hover {
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.25);
+    .btn-contact {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: #0f172a;
+      font-weight: 600;
+      border: none;
+    }
+
+    .btn-contact:hover {
+      background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
       transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
     }
 
     .btn-clear:hover {
-      background: rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.25);
       border-color: rgba(239, 68, 68, 0.4);
       color: #fca5a5;
+      transform: translateY(-1px);
     }
 
     /* Chat Area */
@@ -192,14 +200,14 @@
       width: 6px;
     }
     .chat-area::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(52, 211, 153, 0.25);
       border-radius: 10px;
     }
 
     /* Welcome Banner */
     .welcome-card {
-      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
-      border: 1px solid rgba(99, 102, 241, 0.25);
+      background: linear-gradient(135deg, rgba(5, 150, 105, 0.2) 0%, rgba(245, 158, 11, 0.15) 100%);
+      border: 1px solid rgba(52, 211, 153, 0.3);
       border-radius: 18px;
       padding: 22px;
       text-align: center;
@@ -216,7 +224,7 @@
 
     .welcome-card p {
       font-size: 0.88rem;
-      color: var(--text-muted);
+      color: #cbd5e1;
       line-height: 1.5;
       max-width: 650px;
       margin: 0 auto 16px auto;
@@ -230,8 +238,8 @@
     }
 
     .chip {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(6, 31, 23, 0.7);
+      border: 1px solid rgba(52, 211, 153, 0.25);
       color: #e2e8f0;
       padding: 8px 14px;
       border-radius: 20px;
@@ -245,7 +253,7 @@
 
     .chip:hover {
       background: var(--primary);
-      border-color: var(--primary);
+      border-color: #34d399;
       color: #ffffff;
       transform: translateY(-2px);
       box-shadow: 0 4px 12px var(--primary-glow);
@@ -280,13 +288,14 @@
     }
 
     .user .avatar {
-      background: linear-gradient(135deg, #a855f7, #6366f1);
+      background: linear-gradient(135deg, #059669, #047857);
       color: #ffffff;
+      border: 1px solid rgba(52, 211, 153, 0.3);
     }
 
     .bot .avatar {
-      background: linear-gradient(135deg, #10b981, #059669);
-      color: #ffffff;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #0f172a;
     }
 
     .bubble {
@@ -302,7 +311,7 @@
       background: var(--user-msg-bg);
       color: #ffffff;
       border-top-right-radius: 4px;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+      box-shadow: 0 4px 14px rgba(4, 120, 87, 0.35);
     }
 
     .bot .bubble {
@@ -327,7 +336,7 @@
     }
 
     .bubble a {
-      color: #60a5fa;
+      color: #6ee7b7;
       text-decoration: underline;
     }
 
@@ -351,7 +360,7 @@
     .dot {
       width: 7px;
       height: 7px;
-      background: var(--text-muted);
+      background: #34d399;
       border-radius: 50%;
       animation: pulse 1.4s infinite ease-in-out both;
     }
@@ -361,7 +370,7 @@
     /* Input Footer */
     footer {
       padding: 18px 28px 22px 28px;
-      background: rgba(15, 23, 42, 0.7);
+      background: rgba(6, 31, 23, 0.85);
       border-top: 1px solid var(--card-border);
     }
 
@@ -369,7 +378,7 @@
       display: flex;
       align-items: center;
       background: var(--input-bg);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(52, 211, 153, 0.2);
       border-radius: 16px;
       padding: 6px 8px 6px 18px;
       transition: all 0.2s ease;
@@ -377,7 +386,7 @@
     }
 
     .input-box:focus-within {
-      border-color: var(--primary);
+      border-color: #10b981;
       box-shadow: 0 0 0 3px var(--primary-glow), inset 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
@@ -396,14 +405,14 @@
     }
 
     textarea::placeholder {
-      color: var(--text-muted);
+      color: #64748b;
     }
 
     .btn-send {
       width: 42px;
       height: 42px;
       border-radius: 12px;
-      background: var(--primary);
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
       border: none;
       color: #ffffff;
       font-size: 16px;
@@ -416,7 +425,7 @@
     }
 
     .btn-send:hover {
-      background: var(--primary-hover);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       transform: scale(1.05);
       box-shadow: 0 0 12px var(--primary-glow);
     }
@@ -433,7 +442,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 0.76rem;
-      color: var(--text-muted);
+      color: #94a3b8;
       margin-top: 10px;
       padding: 0 4px;
     }
@@ -483,8 +492,8 @@
           <i class="fa-solid fa-trash-can"></i> Clear Chat
         </button>
         <a href="https://aehsasfoundation.org/contact-us" target="_blank" rel="noopener noreferrer" class="btn-contact" onclick="window.open('https://aehsasfoundation.org/contact-us', '_blank'); return true;">
-  <i class="fa-solid fa-headset"></i> Contact Us
-</a>
+          <i class="fa-solid fa-headset"></i> Contact Us
+        </a>
       </div>
     </header>
 
@@ -583,13 +592,13 @@
     }
 
     function clearCacheHistory() {
-  if (confirm('Are you sure you want to clear your chat history?')) {
-    localStorage.removeItem('aehsas_chat_history');
-    localStorage.removeItem('aehsas_session_id');
-    localStorage.setItem('aehsas_session_id', 'session_' + Date.now());
-    location.reload();
-  }
-}
+      if (confirm('Are you sure you want to clear your chat history?')) {
+        localStorage.removeItem('aehsas_chat_history');
+        localStorage.removeItem('aehsas_session_id');
+        localStorage.setItem('aehsas_session_id', 'session_' + Date.now());
+        location.reload();
+      }
+    }
 
     // --- UI APPEND FUNCTIONS ---
     function appendUserMessageUI(text, timestamp) {
@@ -671,17 +680,16 @@
         }
 
         const response = await fetch(API_URL, {
-  method: 'POST',
-  headers: headers,
-  body: JSON.stringify({ 
-    user_input: text,
-    session_id: sessionId 
-  })
-});
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({ 
+            user_input: text,
+            session_id: sessionId 
+          })
+        });
 
         removeTypingIndicator();
 
-        // Error status handle (e.g. 500, 404, 400)
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           const detail = errorData.detail || `Server returned status error (${response.status}).`;

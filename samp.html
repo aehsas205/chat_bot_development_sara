@@ -671,7 +671,28 @@
       userInput.style.height = '24px';
       sendBtn.disabled = true;
 
-      showTypingIndicator();
+      // 1. Initialise Bot Bubble with Animated Thinking Dots
+      const botRow = document.createElement('div');
+      botRow.className = 'message-row bot';
+      botRow.innerHTML = `
+        <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+        <div>
+          <div class="bubble">
+            <div class="typing-indicator" style="padding: 4px 6px;">
+              <div class="dot"></div>
+              <div class="dot"></div>
+              <div class="dot"></div>
+            </div>
+          </div>
+          <div class="msg-time">${formatTime(new Date().toISOString())}</div>
+        </div>
+      `;
+      chatArea.appendChild(botRow);
+      scrollToBottom();
+
+      const bubbleDiv = botRow.querySelector('.bubble');
+      let accumulatedText = "";
+      let isFirstChunk = true;
 
       try {
         const headers = { 'Content-Type': 'application/json' };
@@ -688,32 +709,51 @@
           })
         });
 
-        removeTypingIndicator();
-
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
           const detail = errorData.detail || `Server returned status error (${response.status}).`;
           throw new Error(detail);
         }
 
-        const data = await response.json();
-        
-        if (data.session_id) {
-          sessionId = data.session_id;
+        const newSessionId = response.headers.get('X-Session-ID');
+        if (newSessionId) {
+          sessionId = newSessionId;
           localStorage.setItem('aehsas_session_id', sessionId);
           sessionDisplay.textContent = `Session: ${sessionId.slice(0, 8)}...`;
         }
 
-        appendBotMessage(data.response || 'No response received.');
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          
+          if (chunk) {
+            // Remove 3 dots the moment the first token arrives
+            if (isFirstChunk) {
+              bubbleDiv.innerHTML = "";
+              isFirstChunk = false;
+            }
+            accumulatedText += chunk;
+            bubbleDiv.innerHTML = formatBotResponse(accumulatedText);
+            scrollToBottom();
+          }
+        }
+
+        saveMessageToCache('bot', accumulatedText, new Date().toISOString(), false);
+
       } catch (err) {
-        removeTypingIndicator();
         console.error("Fetch error details:", err);
-        const errorMessage = `⚠️ **Error:** ${err.message || "Unable to connect to backend server. Please verify if FastAPI server is running."}`;
-        appendBotMessage(errorMessage, true);
+        bubbleDiv.classList.add('error-bubble');
+        bubbleDiv.innerHTML = formatBotResponse(`⚠️ **Error:** ${err.message || "Unable to connect to backend server. Please verify if FastAPI server is running."}`);
       } finally {
         sendBtn.disabled = false;
       }
     }
+
 
     function escapeHtml(str) {
       return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

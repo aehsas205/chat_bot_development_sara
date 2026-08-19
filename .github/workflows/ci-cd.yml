@@ -5,9 +5,16 @@ on:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
+  # ⏰ Weekly Trigger: Har Sunday raat 3:00 AM IST (Saturday 21:30 UTC)
+  schedule:
+    - cron: '30 21 * * 6'
 
 jobs:
+  # ==========================================================
+  # 1. BUILD & TEST JOB (Runs on Code Push / PR)
+  # ==========================================================
   build-and-test:
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
 
     steps:
@@ -34,3 +41,17 @@ jobs:
       run: |
         echo "CI Passed! Triggering Deployment..."
         curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+
+  # ==========================================================
+  # 2. WEEKLY KNOWLEDGE BASE AUTO-SYNC (Runs Every Sunday 3 AM)
+  # ==========================================================
+  weekly-auto-sync:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Trigger Website Re-scraping & Vector DB Sync
+      run: |
+        echo "⏰ Triggering Weekly Knowledge Auto-Sync on Live Render Server..."
+        curl -X POST "https://aehsas-foundation-chatbot.onrender.com/webhook/sync-knowledge" \
+             -F "secret_token=aehsas_admin_123"

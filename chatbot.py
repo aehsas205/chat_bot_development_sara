@@ -1,9 +1,9 @@
 """ ================================================
-AEHSAS Foundation AI Assistant - Core Chat Model
+AEHSAS Foundation AI Assistant - Core Chat Model (Streaming Enabled)
 ================================================"""
 import os
 import traceback
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated, Generator
 from langgraph.graph.message import add_messages
 from google import genai
 from langchain_core.messages import AIMessage
@@ -21,15 +21,12 @@ tools = [handle_feedback]
 api_key = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
 client = genai.Client(api_key=api_key)
 
-# CORE CHAT MODEL
-def chatmodel(state: State):
-    last_message = state["messages"][-1]
-    user_query = str(last_message.content) if hasattr(last_message, "content") else str(last_message)
-    
+def build_prompt(user_query: str) -> str:
+    """Helper to fetch MCP tools data, RAG chunks, and format the system prompt."""
     mcp_extra_context = check_and_run_mcp_tools(user_query)
     context = retrieve_similar_documents(user_query)
 
-    prompt = f"""You are the official AI Assistant for AEHSAS Foundation.
+    return f"""You are the official AI Assistant for AEHSAS Foundation.
 Your duty is to answer user queries accurately, completely, and naturally using ONLY the provided context below.
 
 MANDATORY SYNTHESIS RULES:
@@ -38,7 +35,7 @@ MANDATORY SYNTHESIS RULES:
    - When asked about Core Values or Values of AEHSAS Foundation, list ALL 6 pillars found in the context (Empowerment Through Access, Equality for Every Voice, Community-Centred Solutions, Transparency and Trust, Collaboration Over Isolation, and Resilience and Sustainability) along with their brief descriptions.
 
 2. MILESTONES & LISTS EXHAUSTIVE DIRECTIVE (NO TRUNCATION):
-   - When asked about Milestones or Achievements, you MUST list ALL major initiatives found in the context (including DISHA Career Counselling, Scholarship Distribution Distribution, Spoken English Program, Entrance Coaching Interviews, Free Academic Support, School Fee Sponsorship, and Educational Events).
+   - When asked about Milestones or Achievements, you MUST list ALL major initiatives found in the context (including DISHA Career Counselling, Scholarship Distribution, Spoken English Program, Entrance Coaching Interviews, Free Academic Support, School Fee Sponsorship, and Educational Events).
    - Format each milestone as a clear, concise bullet point (2-3 sentences per item) so that NO milestone is dropped or truncated due to length.
 
 3. CORE DEFINITIONS & STATEMENTS:
@@ -84,19 +81,49 @@ For further information, please contact the AEHSAS Foundation team:
 User Question: {user_query}
 Answer:"""
 
+# ⚡ REAL-TIME TOKEN STREAMING GENERATOR (NEW)
+def stream_chat_response(user_query: str) -> Generator[str, None, None]:
+    """Yields token chunks word-by-word in real time as they arrive from Gemini."""
+    prompt = build_prompt(user_query)
     try:
-        # # Generate response using gemini-3.5-flash-lite model
-        response = client.models.generate_content(
-            model="gemini-3.5-flash-lite", 
+        response_stream = client.models.generate_content_stream(
+            model="gemini-2.5-flash",
             contents=prompt,
             config={
-                "temperature": 0.1, 
+                "temperature": 0.1,
+                "max_output_tokens": 2048
+            }
+        )
+        for chunk in response_stream:
+            if chunk.text:
+                yield chunk.text
+    except Exception as e:
+        print(f"Error in streaming generation: {e}")
+        traceback.print_exc()
+        yield (
+            "I am currently unable to retrieve this information right now. Please reach out to the AEHSAS Foundation team directly:\n"
+            "• Email: connect2aehsas@gmail.com\n"
+            "• Phone: +91 8126819192 / +91 8447832604\n"
+            "• Contact Form: https://aehsasfoundation.org/contact"
+        )
+
+# STANDARD BATCH FALLBACK (For non-streaming calls)
+def chatmodel(state: State):
+    last_message = state["messages"][-1]
+    user_query = str(last_message.content) if hasattr(last_message, "content") else str(last_message)
+    prompt = build_prompt(user_query)
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash-lite",
+            contents=prompt,
+            config={
+                "temperature": 0.1,
                 "max_output_tokens": 2048
             }
         )
         answer_text = response.text
     except Exception as e:
-        #Fallback handling in case of API failure or connectivity issues
         print(f"Error in chatmodel execution: {e}")
         traceback.print_exc()
         answer_text = (

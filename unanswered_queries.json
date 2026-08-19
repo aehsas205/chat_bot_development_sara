@@ -316,5 +316,11 @@
         "session_id": "session_1786119856709",
         "query": "who will be the next president of aehsas",
         "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-19T19:48:48.102129",
+        "session_id": "session_1787145977916",
+        "query": "Which national \norganizations does \nAEHSAS collaborate \nwith for skill training \nand rural \ndevelopment?",
+        "status": "pending_review"
     }
 ]

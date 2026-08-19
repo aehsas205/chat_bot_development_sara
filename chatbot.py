@@ -87,7 +87,7 @@ def stream_chat_response(user_query: str) -> Generator[str, None, None]:
     prompt = build_prompt(user_query)
     try:
         response_stream = client.models.generate_content_stream(
-            model="gemini-2.5-flash",
+            model="gemini-3.5-flash-lite",
             contents=prompt,
             config={
                 "temperature": 0.1,
@@ -115,7 +115,7 @@ def chatmodel(state: State):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash-lite",
+            model="gemini-3.5-flash-lite",
             contents=prompt,
             config={
                 "temperature": 0.1,

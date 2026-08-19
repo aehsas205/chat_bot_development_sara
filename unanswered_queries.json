@@ -322,5 +322,11 @@
         "session_id": "session_1787145977916",
         "query": "Which national \norganizations does \nAEHSAS collaborate \nwith for skill training \nand rural \ndevelopment?",
         "status": "pending_review"
+    },
+    {
+        "timestamp": "2026-08-19T21:20:22.299671",
+        "session_id": "session_1787154614366",
+        "query": "Can you please tell the current?",
+        "status": "pending_review"
     }
 ]

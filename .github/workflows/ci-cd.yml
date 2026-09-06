@@ -5,7 +5,7 @@ on:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
-  # ⏰ Weekly Trigger: Har Sunday raat 3:00 AM IST (Saturday 21:30 UTC)
+  # ⏰ Weekly Trigger: every Sunday at  3:00 AM IST (Saturday 21:30 UTC)
   schedule:
     - cron: '30 21 * * 6'
 

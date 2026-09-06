@@ -81,7 +81,7 @@ For further information, please contact the AEHSAS Foundation team:
 User Question: {user_query}
 Answer:"""
 
-# ⚡ REAL-TIME TOKEN STREAMING GENERATOR (NEW)
+# ⚡ REAL-TIME TOKEN STREAMING GENERATOR
 def stream_chat_response(user_query: str) -> Generator[str, None, None]:
     """Yields token chunks word-by-word in real time as they arrive from Gemini."""
     prompt = build_prompt(user_query)

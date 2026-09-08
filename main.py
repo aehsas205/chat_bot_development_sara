@@ -19,7 +19,12 @@ from feedback import store_unanswered_query, send_error_notification, send_email
 from scrape_and_embed import process_and_embed_pdf, reindex_website_only
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from mcp_client import execute_drive_ingestion
-from vectorstore_manager import vectorstore  # Aapka ChromaDB vectorstore instance[cite: 1]
+from vectorstore_manager import get_vectorstore
+
+from mcp_client import execute_drive_ingestion
+from vectorstore_manager import get_vectorstore
+
+vectorstore = get_vectorstore()
 
 app = FastAPI(title="AEHSAS Foundation Chatbot API")
 
@@ -302,8 +307,9 @@ async def trigger_admin_drive_sync(admin_key: str = Form(...)):
 
     try:
         status_msg = await asyncio.to_thread(
-            execute_drive_ingestion, DRIVE_FOLDER_ID, vectorstore, drive_splitter
-        )
+    execute_drive_ingestion, DRIVE_FOLDER_ID, vectorstore, drive_splitter
+)
+        
         return {"status": "success", "message": status_msg}
     except Exception as e:
         tb_str = traceback.format_exc()

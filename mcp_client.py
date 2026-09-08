@@ -80,7 +80,12 @@ def sync_drive_documents(folder_id: str) -> dict:
         processed_ids = _get_processed_ids()
 
         query = f"'{folder_id}' in parents and mimeType='application/pdf' and trashed=false"
-        response = service.files().list(q=query, fields="files(id, name)").execute()
+        response = service.files().list(
+            q=query, 
+            fields="files(id, name)",
+            supportsAllDrives=True,
+            includeItemsFromAllDrives=True
+        ).execute()
         files = response.get('files', [])
 
         new_documents = []
@@ -227,6 +232,6 @@ if __name__ == "__main__":
     
     # Test Drive Tool Syntax (Pass your folder id to test live)
     print("\nTesting Drive Tool Syntax...")
-    drive_test = sync_drive_documents("107axMbDQ6nz0vJx9IKYmpswy6a27f1kQ")
+    drive_test = sync_drive_documents("107axMbDQ6nz0vJx9IKYmpsWy6a27f1KQ")
     print("Drive Check Status:", drive_test.get("error") or drive_test.get("status"))
     print("---------------------------------------\n")

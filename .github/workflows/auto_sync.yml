@@ -2,7 +2,7 @@
         uses: actions/checkout@v4
         with:
           ref: develop
-          token: ${{ secrets.BOT_PUSH_PAT }} # Uses your PAT with write access
+          token: ${{ secrets.BOT_PUSH_PAT }} 
 
       - name: Set up Python
         uses: actions/setup-python@v5

@@ -3,7 +3,7 @@ name: Trigger Chatbot Update
 on:
   push:
     branches:
-      - main # Ya jis branch par website ka production code merge hota hai
+      - main 
 
 jobs:
   notify-chatbot-repo:

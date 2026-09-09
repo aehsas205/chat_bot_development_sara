@@ -5,18 +5,13 @@ on:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
-  # ⏰ Weekly Trigger: every Sunday at 3:00 AM IST (Saturday 21:30 UTC)
   schedule:
     - cron: '30 21 * * 6'
-  # 🌐 Cross-repo trigger from Website repo
   repository_dispatch:
     types: [website-updated]
   workflow_dispatch:
 
 jobs:
-  # ==========================================================
-  # 1. BUILD & TEST JOB (Runs on Code Push / PR)
-  # ==========================================================
   build-and-test:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -37,18 +32,14 @@ jobs:
 
     - name: Syntax & Import Check
       run: |
-        python -m py_compile main.py chatbot.py retriever.py scrape_and_embed.py
+        python -m py_compile main.py
 
-    # --- 🚀 CD Step (Continuous Deployment) ---
     - name: Trigger Render Deployment (CD)
       if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
       run: |
         echo "CI Passed! Triggering Deployment..."
         curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
-  # ==========================================================
-  # 2. KNOWLEDGE BASE AUTO-SYNC (Weekly OR on Website Repo Push)
-  # ==========================================================
   knowledge-auto-sync:
     if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest

@@ -12,6 +12,9 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ==========================================================
+  # 1. BUILD & TEST JOB
+  # ==========================================================
   build-and-test:
     if: github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
@@ -32,14 +35,20 @@ jobs:
 
     - name: Syntax & Import Check
       run: |
-        python -m py_compile main.py
+        python -m py_compile main.py scrape_and_embed.py
 
+    # Optional CD Step: Sirf tab chalega agar RENDER_DEPLOY_HOOK secret defined ho
     - name: Trigger Render Deployment (CD)
-      if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
+      if: env.RENDER_HOOK != '' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop') && github.event_name == 'push'
+      env:
+        RENDER_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
       run: |
-        echo "CI Passed! Triggering Deployment..."
-        curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+        echo "Triggering Deployment Hook..."
+        curl -X POST "$RENDER_HOOK"
 
+  # ==========================================================
+  # 2. KNOWLEDGE BASE AUTO-SYNC
+  # ==========================================================
   knowledge-auto-sync:
     if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest

@@ -1,0 +1,29 @@
+- name: Checkout Chatbot Code
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+          token: ${{ secrets.BOT_PUSH_PAT }} # Uses your PAT with write access
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run Scraping & Re-indexing
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_DRIVE_FOLDER_ID: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+        run: |
+          python -c "from scrape_and_embed import reindex_website_only; reindex_website_only()"
+
+      - name: Commit and Push Updated Vector Index
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add chroma_index/
+          git diff --staged --quiet || (git commit -m "Auto-synced embeddings [skip ci]" && git push origin develop)

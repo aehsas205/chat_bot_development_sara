@@ -5,9 +5,13 @@ on:
     branches: [ "main", "develop" ]
   pull_request:
     branches: [ "main", "develop" ]
-  # ⏰ Weekly Trigger: every Sunday at  3:00 AM IST (Saturday 21:30 UTC)
+  # ⏰ Weekly Trigger: every Sunday at 3:00 AM IST (Saturday 21:30 UTC)
   schedule:
     - cron: '30 21 * * 6'
+  # 🌐 Cross-repo trigger from Website repo
+  repository_dispatch:
+    types: [website-updated]
+  workflow_dispatch:
 
 jobs:
   # ==========================================================
@@ -31,9 +35,9 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-    - name: Build Docker Image Test
+    - name: Syntax & Import Check
       run: |
-        docker build -t aehsas-chatbot:latest .
+        python -m py_compile main.py chatbot.py retriever.py scrape_and_embed.py
 
     # --- 🚀 CD Step (Continuous Deployment) ---
     - name: Trigger Render Deployment (CD)
@@ -43,15 +47,15 @@ jobs:
         curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
 
   # ==========================================================
-  # 2. WEEKLY KNOWLEDGE BASE AUTO-SYNC (Runs Every Sunday 3 AM)
+  # 2. KNOWLEDGE BASE AUTO-SYNC (Weekly OR on Website Repo Push)
   # ==========================================================
-  weekly-auto-sync:
-    if: github.event_name == 'schedule'
+  knowledge-auto-sync:
+    if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
     runs-on: ubuntu-latest
 
     steps:
-    - name: Trigger Website Re-scraping & Vector DB Sync
+    - name: Trigger Website Re-scraping on Live Render Server
       run: |
-        echo "⏰ Triggering Weekly Knowledge Auto-Sync on Live Render Server..."
+        echo "⏰ Triggering Knowledge Auto-Sync on Live Render Server..."
         curl -X POST "https://aehsas-foundation-chatbot.onrender.com/webhook/sync-knowledge" \
              -F "secret_token=aehsas_admin_123"

@@ -1,0 +1,17 @@
+name: Trigger Chatbot Update
+
+on:
+  push:
+    branches:
+      - main # Ya jis branch par website ka production code merge hota hai
+
+jobs:
+  notify-chatbot-repo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch Event to Chatbot Repo
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CHATBOT_TRIGGER_TOKEN }}
+          repository: aapka-github-username/chat_bot_development
+          event-type: website-updated

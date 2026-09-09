@@ -322,3 +322,19 @@ async def trigger_admin_drive_sync(admin_key: str = Form(...)):
         except Exception:
             pass
         raise HTTPException(status_code=500, detail=f"Failed to sync Google Drive: {str(e)}")
+
+from fastapi import BackgroundTasks, HTTPException, Header
+from scrape_and_embed import reindex_website_only
+
+ADMIN_SECRET = os.getenv("ADMIN_REINDEX_SECRET", "super-secure-key-123")
+
+@app.post("/admin/reindex-website")
+def trigger_website_reindex(
+    background_tasks: BackgroundTasks,
+    x_admin_token: str = Header(None)
+):
+    if x_admin_token != ADMIN_SECRET:
+        raise HTTPException(status_code=403, detail="Unauthorized")
+
+    background_tasks.add_task(reindex_website_only)
+    return {"status": "success", "message": "Website re-indexing initiated in background."}

@@ -46,16 +46,3 @@ jobs:
         echo "Triggering Deployment Hook..."
         curl -X POST "$RENDER_HOOK"
 
-  # ==========================================================
-  # 2. KNOWLEDGE BASE AUTO-SYNC
-  # ==========================================================
-  knowledge-auto-sync:
-    if: github.event_name == 'schedule' || github.event_name == 'repository_dispatch'
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Trigger Website Re-scraping on Live Render Server
-      run: |
-        echo "⏰ Triggering Knowledge Auto-Sync on Live Render Server..."
-        curl -X POST "https://aehsas-foundation-chatbot.onrender.com/webhook/sync-knowledge" \
-             -F "secret_token=aehsas_admin_123"

@@ -1,212 +1,88 @@
-# Aehsaas Foundation Chatbot :- Documentation
+# AEHSAS Foundation Chatbot — Technical Documentation & Runbook
 
-## Project Overview
-This is a FastAPI-based chatbot application for the Aehsaas Foundation, a nonprofit humanitarian organization. The chatbot uses RAG (Retrieval-Augmented Generation) to provide accurate information about the foundation's services, programs, and activities.
+An asynchronous Retrieval-Augmented Generation (RAG) conversational engine designed for the AEHSAS Foundation. Built on FastAPI, LangGraph, ChromaDB, and Google Gemini 2.5 Flash, the service provides verified, hallucination-free answers regarding foundation programs, donation routes, membership fees, and contact details.
 
-## Project Structure
+**Live Deployment URL**: https://chat-bot-development.onrender.com/
+---
 
-### Core Files:
-- `main.py` - FastAPI server with chat endpoint
-- `config.py` - System configuration and session management
-- `chatbot.py` - LangChain chatbot setup with Google Gemini model
-- `graph.py` - LangGraph workflow definition
-- `embed.py` - Document embedding and storage functionality
-- `retriever.py` - Document retrieval tool
-- `vectorstore_manager.py` - Chroma vector database management
-- `feedback.py` - User feedback handling tool
-- `samp.html` - Simple web interface for testing
+## 1. Project Architecture & Directory Structure
 
-### Directories:
-- `chroma_index/` - Persistent vector database storage
-- `all-MiniLM-L6-v2/` - Sentence transformer embedding model
-- `venv/` - Python virtual environment
+```text
+chat_bot_development/
+├── .github/
+│   └── workflows/
+│       ├── auto_sync.yml            # Automated scraping & index sync pipeline
+│       ├── ci-cd.yml                # Build, test, and Render deployment workflow
+│       └── trigger_chatbot.yml      # Cross-repo repository dispatch trigger
+├── all-MiniLM-L6-v2/                # Local HuggingFace sentence transformer weights
+├── chroma_index/                    # Persistent ChromaDB vector database storage
+├── uploads/                         # Staging directory for Google Drive synced PDFs
+├── .env.example                     # Environment variable template
+├── .gitignore                       # Ignored paths (.env, caches, indexes)
+├── chatbot.py                       # LangChain/Gemini LLM initialization & tool bindings
+├── config.py                        # System prompts, grounded directives, and constants
+├── Dockerfile                       # Container deployment definition
+├── embed.py                         # PDF document loader (PyMuPDF) and recursive chunker
+├── feedback.py                      # Observability, unanswered queries & escalation routing
+├── google_credentials.json          # Google Drive API service credentials (git-ignored)
+├── graph.py                         # LangGraph StateGraph, tool loops & MemorySaver checkpointer
+├── main.py                          # FastAPI ASGI gateway, CORS, and chat endpoints
+├── mcp_client.py                    # FastMCP tool integrations (donation & fee calculations)
+├── mcp_server.py                    # Local Model Context Protocol server definition
+├── processed_drive_files.json       # State tracker for synced Google Drive documents
+├── requirements.txt                 # Project dependencies
+├── retriever.py                     # Vector store retrieval tool & candidate expansion logic
+├── samp.html                        # Frontend testing chat widget with voice & SSE typing
+├── scrape_and_embed.py              # Headless Selenium website extraction & re-indexing
+└── vectorstore_manager.py           # ChromaDB index lifecycle and embedding initialization
 
-## Prerequisites
+## 2. Prerequisites
+Python Version: Python 3.10 is required[cite: 2].
 
-### 1. Python Environment
-- Python 3.11 or higher
-- Virtual environment (recommended)
+Google Cloud / AI Studio: Valid API key enabled for Gemini 2.5 Flash
 
-### 2. Required Environment Variables
-Create a `.env` file in the project root with:
-```
-GOOGLE_API_KEY=your_google_generative_ai_api_key
-```
+Google Drive API: Service account JSON credentials configured with read access to the designated folder
 
-### 3. Dependencies
-All dependencies are listed in `requirements.txt`
+## 3. Environment Configuration
+Create a .env file in the project root director
+# LLM & Embedding Credentials
+GOOGLE_API_KEY="your_google_generative_ai_api_key"
 
-## Installation & Setup
+# Knowledge Ingestion & Sync
+GOOGLE_DRIVE_FOLDER_ID="your_google_drive_folder_id"
+CHATBOT_TRIGGER_TOKEN="your_github_personal_access_token"
 
-### Step 1: Clone and Navigate
-```bash
-cd /path/to/aehsas_chatbot
-```
+# Automated Escalation & Notification
+SENDER_EMAIL="notifications@gmail.com"
+SENDER_PASSWORD="your_smtp_app_password"
+ADMIN_EMAIL="admin_email_id@gmail.com"
 
-### Step 2: Activate Virtual Environment
-```bash
-# Windows
+4. Installation & Local Setup
+
+Step 1: Clone Repository and Navigate Bash
+git clone [https://github.com/your-org/chat_bot_development.git](https://github.com/your-org/chat_bot_development.git)
+cd chat_bot_development
+
+Step 2: Create and Activate Virtual Environment
+# Linux / macOS
+python3.10 -m venv venv
+source venv/bin/activate
+
+# Windows (Command Prompt / PowerShell)
+python -m venv venv
 venv\Scripts\activate
 
-# Linux/Mac
-source venv/bin/activate
-```
-
-### Step 3: Install Dependencies
-```bash
+Step 3: Install Required Dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
-```
 
-### Step 4: Set Up Environment Variables
-Create a `.env` file with your Google API key:
-```
-GOOGLE_API_KEY=your_actual_api_key_here
-```
+## 5. Knowledge Base Ingestion & Vector Indexing
+Before launching the server for the first time, populate the vector store:
+Ingest Local PDFs
+python embed.py
+Automated Website Scraping & Re-indexing
+python -c "from scrape_and_embed import reindex_website_only; reindex_website_only()"
 
-## How to Run the Application
-
-### Method 1: Run FastAPI Server
-```bash
-uvicorn main:app --reload
-```
-The server will start at `http://localhost:8000`
-
-### Method 2: Run Simple Web Interface
-```bash
-python -m http.server 3000
-```
-Then open `http://localhost:3000/samp.html` in your browser
-
-## API Endpoints
-
-### Chat
-- `POST /chat` - Send messages to the chatbot
-  - Requires: `{"user_input": "your message"}`
-  - Returns: `{"response": "bot response", "session_id": "session_id"}`
-
-## Code Architecture Understanding
-
-### 1. Main Application (`main.py`)
-- **FastAPI Setup**: Creates the main application with CORS middleware
-- **Session Management**: Automatic session cleanup for inactive users (60 minutes)
-- **Endpoints**: Chat endpoint with session-based conversation memory
-- **Lifespan Management**: Warm-up RAG pipeline on startup
-
-### 2. Configuration (`config.py`)
-- **System Message**: Defines the chatbot's behavior and scope
-- **Memory Management**: Session-based conversation memory using LangGraph checkpointer
-
-
-### 3. Chatbot Engine (`chatbot.py`)
-- **LLM Setup**: Google Gemini 3.1 Flash Lite model
-- **Tools Integration**: Binds retrieval and feedback tools
-- **State Management**: Handles conversation state
-
-### 4. Workflow Graph (`graph.py`)
-- **LangGraph Setup**: Defines the conversation workflow
-- **Tool Integration**: Connects chatbot with retrieval tools
-- **Memory Checkpointing**: Persists conversation state
-
-### 5. Document Processing (`embed.py`)
-- **PDF Loading**: Uses PyMuPDF for PDF processing
-- **Text Splitting**: Recursive character splitting for optimal chunks
-- **Vector Storage**: Stores embeddings in Chroma database
-
-### 6. Retrieval System (`retriever.py`)
-- **Similarity Search**: Finds relevant documents based on user queries
-- **Content Processing**: Cleans and formats retrieved content
-
-### 7. Vector Database (`vectorstore_manager.py`)
-- **Chroma Setup**: Persistent vector database configuration
-- **Embedding Model**: HuggingFace sentence transformer
-- **Collection Management**: Handles document collections
-
-## Key Features
-
-### 1. RAG (Retrieval-Augmented Generation)
-- Documents are embedded and stored in a vector database
-- Queries are matched against stored documents
-- Responses are based on retrieved content, not hallucination
-
-### 2. Multi-language Support
-- Handles Hindi queries by translating to English for processing
-- Returns responses in the original language
-
-
-
-### 3. Feedback System
-- Built-in feedback handling for user interactions
-- Supports positive, negative, and human assistance requests
-
-## Usage Examples
-
-### 1. Starting the Server
-```bash
-# Terminal 1: Start FastAPI server
-uvicorn main:app --reload
-
-# Terminal 2: Start web interface (optional)
-python -m http.server 3000
-```
-
-### 2. Testing the Chatbot
-1. Open `http://localhost:3000/samp.html`
-2. Type your question about Aehsaas Foundation
-3. Click "Send" to get a response
-
-### 3. Using the API Directly
-```bash
-# Send a chat message
-curl -X POST "http://localhost:8000/chat" \
-  -H "Content-Type: application/json" \
-  -d '{"user_input": "What services does Aehsaas Foundation provide?"}'
-```
-
-## Troubleshooting
-
-### Common Issues:
-
-1. **Import Errors**: Make sure all dependencies are installed
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-2. **API Key Issues**: Ensure your Google API key is set in `.env`
-   ```
-   GOOGLE_API_KEY=your_actual_key
-   ```
-
-3. **Port Conflicts**: Change ports if 8000 or 3000 are in use
-   ```bash
-   uvicorn main:app --reload --port 8001
-   ```
-
-
-
-### Debug Mode:
-Enable debug logging by modifying the logging level in `main.py`:
-```python
-logging.basicConfig(level=logging.DEBUG)
-```
-
-## Security Considerations
-
-1. **API Keys**: Never commit API keys to version control
-
-
-## Performance Optimization
-
-1. **Document Chunking**: Optimize chunk size in `embed.py` for your use case
-2. **Vector Search**: Adjust `k` parameter in `retriever.py` for search results
-3. **Memory Management**: Monitor session cleanup frequency
-4. **Caching**: Consider implementing response caching for common queries
-
-## Development Notes
-
-- The system uses LangGraph for workflow management
-- ChromaDB provides persistent vector storage
-- Google Gemini 3.1 Flash Lite model powers the language model
-- FastAPI provides the REST API framework
-- Session-based memory maintains conversation context
-- Automatic RAG pipeline warm-up on server startup
-
+## 6. Running the Application
+Start FastAPI Backend
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
